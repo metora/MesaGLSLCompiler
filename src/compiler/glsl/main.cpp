@@ -43,6 +43,8 @@ const struct option compiler_opts[] = {
    { "dump-hir", no_argument, &options.dump_hir, 1 },
    { "dump-lir", no_argument, &options.dump_lir, 1 },
    { "dump-builder", no_argument, &options.dump_builder, 1 },
+   { "dump-glsl", no_argument, &options.dump_glsl, 1 },
+   { "dump-spirv", no_argument, &options.dump_spirv, 1 },
    { "link",     no_argument, &options.do_link,  1 },
    { "just-log", no_argument, &options.just_log, 1 },
    { "version",  required_argument, NULL, 'v' },
@@ -97,4 +99,10 @@ main(int argc, char * const* argv)
    standalone_compiler_cleanup(whole_program);
 
    return status;
+}
+
+extern "C" void
+_mesa_error_no_memory(const char *caller)
+{
+
 }

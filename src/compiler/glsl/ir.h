@@ -90,6 +90,10 @@ class ir_instruction : public exec_node {
 public:
    enum ir_node_type ir_type;
 
+   unsigned int ir_temp;
+   unsigned int ir_temp2;
+   struct exec_node *parent;
+
    /**
     * GCC 4.7+ and clang warn when deleting an ir_instruction unless
     * there's a virtual destructor present.  Because we almost

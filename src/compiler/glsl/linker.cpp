@@ -73,7 +73,6 @@
 #include "program.h"
 #include "program/prog_instruction.h"
 #include "program/program.h"
-#include "util/mesa-sha1.h"
 #include "util/set.h"
 #include "util/string_to_uint_map.h"
 #include "linker.h"
@@ -82,7 +81,6 @@
 #include "ir_rvalue_visitor.h"
 #include "ir_uniform.h"
 #include "builtin_functions.h"
-#include "shader_cache.h"
 
 #include "main/shaderobj.h"
 #include "main/enums.h"

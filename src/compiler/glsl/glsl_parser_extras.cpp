@@ -33,8 +33,6 @@
 #include "main/shaderobj.h"
 #include "util/u_atomic.h" /* for p_atomic_cmpxchg */
 #include "util/ralloc.h"
-#include "util/disk_cache.h"
-#include "util/mesa-sha1.h"
 #include "ast.h"
 #include "glsl_parser_extras.h"
 #include "glsl_parser.h"
@@ -2008,25 +2006,7 @@ _mesa_glsl_compile_shader(struct gl_context *ctx, struct gl_shader *shader,
    const char *source = force_recompile && shader->FallbackSource ?
       shader->FallbackSource : shader->Source;
 
-   if (!force_recompile) {
-      if (ctx->Cache) {
-         char buf[41];
-         disk_cache_compute_key(ctx->Cache, source, strlen(source),
-                                shader->sha1);
-         if (disk_cache_has_key(ctx->Cache, shader->sha1)) {
-            /* We've seen this shader before and know it compiles */
-            if (ctx->_Shader->Flags & GLSL_CACHE_INFO) {
-               _mesa_sha1_format(buf, shader->sha1);
-               fprintf(stderr, "deferring compile of shader: %s\n", buf);
-            }
-            shader->CompileStatus = compile_skipped;
-
-            free((void *)shader->FallbackSource);
-            shader->FallbackSource = NULL;
-            return;
-         }
-      }
-   } else {
+   if (true) {
       /* We should only ever end up here if a re-compile has been forced by a
        * shader cache miss. In which case we can skip the compile if its
        * already be done by a previous fallback or the initial compile call.

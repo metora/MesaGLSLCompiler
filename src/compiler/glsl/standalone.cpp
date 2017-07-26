@@ -41,6 +41,9 @@
 #include "linker.h"
 #include "glsl_parser_extras.h"
 #include "ir_builder_print_visitor.h"
+#include "ir_print_glsl_visitor.h"
+#include "ir_print_spirv_visitor.h"
+#include "compiler/spirv/disassemble.h"
 #include "builtin_functions.h"
 #include "opt_add_neg_to_sub.h"
 
@@ -385,6 +388,20 @@ compile_shader(struct gl_context *ctx, struct gl_shader *shader)
    /* Print out the resulting IR */
    if (!state->error && options->dump_lir) {
       _mesa_print_ir(stdout, shader->ir, state);
+   }
+
+   if (!state->error && options->dump_glsl) {
+      static char temp[65536];
+      string_buffer buffer(temp, sizeof(temp));
+      _mesa_print_glsl(&buffer, shader->ir, state);
+      fprintf(stdout, "%s", temp);
+   }
+
+   if (!state->error && options->dump_spirv) {
+      static unsigned int temp[65536];
+      spirv_buffer buffer(temp, sizeof(temp));
+      _mesa_print_spirv(&buffer, shader->ir, shader->Type);
+      spv::Disassemble(std::cout, std::vector<unsigned int>(temp, temp + buffer.count()));
    }
 
    return;
