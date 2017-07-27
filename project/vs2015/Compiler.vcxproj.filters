@@ -37,6 +37,15 @@
     <Filter Include="src\getopt">
       <UniqueIdentifier>{b3e82e01-0d98-40be-b1b8-f53650b89c6f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\gallium">
+      <UniqueIdentifier>{7dbdc765-fc60-478f-847d-49c84ae93351}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\gallium\auxiliary">
+      <UniqueIdentifier>{a0770a09-e563-49c5-afec-fba8cb6afe59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\gallium\auxiliary\util">
+      <UniqueIdentifier>{2ad4a644-786e-4d03-a7f5-9b486ed90938}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\compiler\builtin_type_macros.h">
@@ -243,12 +252,6 @@
     <ClInclude Include="..\..\src\mesa\main\uniforms.h">
       <Filter>src\mesa\main</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\mesa\main\version.h">
-      <Filter>src\mesa\main</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\mesa\program\ir_to_mesa.h">
-      <Filter>src\mesa\program</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\mesa\program\prog_instruction.h">
       <Filter>src\mesa\program</Filter>
     </ClInclude>
@@ -299,6 +302,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\compiler\spirv\doc.h">
       <Filter>src\compiler\spirv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gallium\auxiliary\util\u_math.h">
+      <Filter>src\gallium\auxiliary\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

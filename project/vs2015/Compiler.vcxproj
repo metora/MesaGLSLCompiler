@@ -175,6 +175,7 @@
     <ClInclude Include="..\..\src\compiler\spirv\doc.h" />
     <ClInclude Include="..\..\src\compiler\spirv\GLSL.std.450.h" />
     <ClInclude Include="..\..\src\compiler\spirv\spirv.h" />
+    <ClInclude Include="..\..\src\gallium\auxiliary\util\u_math.h" />
     <ClInclude Include="..\..\src\getopt\getopt.h" />
     <ClInclude Include="..\..\src\mesa\main\compiler.h" />
     <ClInclude Include="..\..\src\mesa\main\config.h" />
@@ -191,8 +192,6 @@
     <ClInclude Include="..\..\src\mesa\main\mtypes.h" />
     <ClInclude Include="..\..\src\mesa\main\shaderobj.h" />
     <ClInclude Include="..\..\src\mesa\main\uniforms.h" />
-    <ClInclude Include="..\..\src\mesa\main\version.h" />
-    <ClInclude Include="..\..\src\mesa\program\ir_to_mesa.h" />
     <ClInclude Include="..\..\src\mesa\program\prog_instruction.h" />
     <ClInclude Include="..\..\src\mesa\program\prog_parameter.h" />
     <ClInclude Include="..\..\src\mesa\program\prog_statevars.h" />
