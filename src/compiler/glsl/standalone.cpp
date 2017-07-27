@@ -44,6 +44,7 @@
 #include "ir_print_glsl_visitor.h"
 #include "ir_print_spirv_visitor.h"
 #include "compiler/spirv/disassemble.h"
+#include "compiler/spirv/spirv_glsl.hpp"
 #include "builtin_functions.h"
 #include "opt_add_neg_to_sub.h"
 
@@ -397,13 +398,6 @@ compile_shader(struct gl_context *ctx, struct gl_shader *shader)
       fprintf(stdout, "%s", temp);
    }
 
-   if (!state->error && options->dump_spirv) {
-      static unsigned int temp[65536];
-      spirv_buffer buffer(temp, sizeof(temp));
-      _mesa_print_spirv(&buffer, shader->ir, shader->Type);
-      spv::Disassemble(std::cout, std::vector<unsigned int>(temp, temp + buffer.count()));
-   }
-
    return;
 }
 
@@ -551,7 +545,7 @@ standalone_compile_shader(const struct standalone_options *_options,
                progress = do_function_inlining(ir);
 
                progress = do_common_optimization(ir,
-                                                 false,
+                                                 true,
                                                  false,
                                                  compiler_options,
                                                  true)
@@ -593,6 +587,36 @@ standalone_compile_shader(const struct standalone_options *_options,
                continue;
 
             _mesa_print_builder_for_ir(stdout, shader->ir);
+         }
+      }
+
+      if (options->dump_spirv) {
+         for (unsigned i = 0; i < MESA_SHADER_STAGES; i++) {
+            struct gl_linked_shader *shader = whole_program->_LinkedShaders[i];
+
+            if (!shader)
+               continue;
+
+            static unsigned int temp[65536];
+            spirv_buffer buffer(temp, sizeof(temp));
+            _mesa_print_spirv(&buffer, shader->ir, gl_shader_stage(i));
+            spv::Disassemble(std::cout, std::vector<unsigned int>(temp, temp + buffer.count()));
+
+            if (options->dump_spirv_glsl) {
+
+               // Read SPIR-V from.
+               spirv_cross::CompilerGLSL glsl(std::vector<unsigned int>(temp, temp + buffer.count()));
+
+               // Set some options.
+               spirv_cross::CompilerGLSL::Options options;
+               options.version = whole_program->Shaders[i]->Version;
+               options.es = whole_program->IsES;
+               glsl.set_options(options);
+
+               // Compile to GLSL, ready to give to GL driver.
+               std::string source = glsl.compile();
+               std::cout << source;
+            }
          }
       }
    }

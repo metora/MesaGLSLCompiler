@@ -306,6 +306,33 @@
     <ClInclude Include="..\..\src\gallium\auxiliary\util\u_math.h">
       <Filter>src\gallium\auxiliary\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\compiler\spirv\spirv_cfg.hpp">
+      <Filter>src\compiler\spirv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\compiler\spirv\spirv_common.hpp">
+      <Filter>src\compiler\spirv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\compiler\spirv\spirv_cpp.hpp">
+      <Filter>src\compiler\spirv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\compiler\spirv\spirv_cross.hpp">
+      <Filter>src\compiler\spirv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\compiler\spirv\spirv_glsl.hpp">
+      <Filter>src\compiler\spirv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\compiler\spirv\GLSL.ext.AMD.h">
+      <Filter>src\compiler\spirv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\compiler\spirv\GLSL.ext.KHR.h">
+      <Filter>src\compiler\spirv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\compiler\spirv\GLSL.ext.NV.h">
+      <Filter>src\compiler\spirv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\compiler\spirv\spirv.hpp">
+      <Filter>src\compiler\spirv</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\compiler\glsl_types.cpp">
@@ -675,6 +702,18 @@
       <Filter>src\compiler\spirv</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\compiler\spirv\doc.cpp">
+      <Filter>src\compiler\spirv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\compiler\spirv\spirv_cfg.cpp">
+      <Filter>src\compiler\spirv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\compiler\spirv\spirv_cpp.cpp">
+      <Filter>src\compiler\spirv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\compiler\spirv\spirv_cross.cpp">
+      <Filter>src\compiler\spirv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\compiler\spirv\spirv_glsl.cpp">
       <Filter>src\compiler\spirv</Filter>
     </ClCompile>
   </ItemGroup>

@@ -89,7 +89,7 @@ public:
    unsigned int const_float_id[16];
    unsigned int const_int_id[16];
 
-   GLenum shader_type;
+   gl_shader_stage shader_stage;
 };
 
 /**
@@ -151,7 +151,7 @@ private:
 
 extern "C" {
 void
-_mesa_print_spirv(spirv_buffer *f, exec_list *instructions, GLenum type);
+_mesa_print_spirv(spirv_buffer *f, exec_list *instructions, gl_shader_stage stage);
 }
 
 #endif /* IR_PRINT_SPIRV_VISITOR_H */

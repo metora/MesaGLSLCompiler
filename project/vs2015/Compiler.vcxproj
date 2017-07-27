@@ -141,6 +141,10 @@
     </ClCompile>
     <ClCompile Include="..\..\src\compiler\spirv\disassemble.cpp" />
     <ClCompile Include="..\..\src\compiler\spirv\doc.cpp" />
+    <ClCompile Include="..\..\src\compiler\spirv\spirv_cfg.cpp" />
+    <ClCompile Include="..\..\src\compiler\spirv\spirv_cpp.cpp" />
+    <ClCompile Include="..\..\src\compiler\spirv\spirv_cross.cpp" />
+    <ClCompile Include="..\..\src\compiler\spirv\spirv_glsl.cpp" />
     <ClCompile Include="..\..\src\getopt\getopt_long.c" />
     <ClCompile Include="..\..\src\mesa\main\extensions_table.c">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -173,8 +177,17 @@
     <ClInclude Include="..\..\src\compiler\glsl\ir_print_spirv_visitor.h" />
     <ClInclude Include="..\..\src\compiler\spirv\disassemble.h" />
     <ClInclude Include="..\..\src\compiler\spirv\doc.h" />
+    <ClInclude Include="..\..\src\compiler\spirv\GLSL.ext.AMD.h" />
+    <ClInclude Include="..\..\src\compiler\spirv\GLSL.ext.KHR.h" />
+    <ClInclude Include="..\..\src\compiler\spirv\GLSL.ext.NV.h" />
     <ClInclude Include="..\..\src\compiler\spirv\GLSL.std.450.h" />
     <ClInclude Include="..\..\src\compiler\spirv\spirv.h" />
+    <ClInclude Include="..\..\src\compiler\spirv\spirv.hpp" />
+    <ClInclude Include="..\..\src\compiler\spirv\spirv_cfg.hpp" />
+    <ClInclude Include="..\..\src\compiler\spirv\spirv_common.hpp" />
+    <ClInclude Include="..\..\src\compiler\spirv\spirv_cpp.hpp" />
+    <ClInclude Include="..\..\src\compiler\spirv\spirv_cross.hpp" />
+    <ClInclude Include="..\..\src\compiler\spirv\spirv_glsl.hpp" />
     <ClInclude Include="..\..\src\gallium\auxiliary\util\u_math.h" />
     <ClInclude Include="..\..\src\getopt\getopt.h" />
     <ClInclude Include="..\..\src\mesa\main\compiler.h" />

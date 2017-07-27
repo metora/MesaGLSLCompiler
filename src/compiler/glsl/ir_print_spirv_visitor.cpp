@@ -97,7 +97,7 @@ spirv_buffer::~spirv_buffer() {
 
 extern "C" {
 void
-_mesa_print_spirv(spirv_buffer *f, exec_list *instructions, GLenum type)
+_mesa_print_spirv(spirv_buffer *f, exec_list *instructions, gl_shader_stage stage)
 {
    f->id = 1;
    f->binding_id = 0;
@@ -114,7 +114,7 @@ _mesa_print_spirv(spirv_buffer *f, exec_list *instructions, GLenum type)
    memset(f->int_id, 0, sizeof(f->int_id));
    memset(f->const_float_id, 0, sizeof(f->const_float_id));
    memset(f->const_int_id, 0, sizeof(f->const_int_id));
-   f->shader_type = type;
+   f->shader_stage = stage;
 
    // ExtInstImport
    f->import_id = f->id++;
@@ -386,7 +386,7 @@ void ir_print_spirv_visitor::visit(ir_variable *ir)
          f->decorates.push(SpvOpDecorate | (4 << SpvWordCountShift));
          f->decorates.push(name_id);
          f->decorates.push(SpvDecorationDescriptorSet);
-         f->decorates.push(f->shader_type == GL_VERTEX_SHADER ? 0u : 1u);
+         f->decorates.push(f->shader_stage == MESA_SHADER_VERTEX ? 0u : 1u);
 
          f->decorates.push(SpvOpDecorate | (4 << SpvWordCountShift));
          f->decorates.push(name_id);
@@ -434,7 +434,7 @@ void ir_print_spirv_visitor::visit(ir_variable *ir)
             f->decorates.push(SpvOpDecorate | (4 << SpvWordCountShift));
             f->decorates.push(f->uniform_id);
             f->decorates.push(SpvDecorationDescriptorSet);
-            f->decorates.push(f->shader_type == GL_VERTEX_SHADER ? 0u : 1u);
+            f->decorates.push(f->shader_stage == MESA_SHADER_VERTEX ? 0u : 1u);
 
             f->decorates.push(SpvOpDecorate | (4 << SpvWordCountShift));
             f->decorates.push(f->uniform_id);
