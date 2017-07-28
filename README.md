@@ -1,4 +1,4 @@
-# Mesa GLSL Compiler
+# Mesa GLSL and SPIR-V Generator
 
 ### Usage
 ```
@@ -76,7 +76,7 @@ C:\>Compiler.exe --version 120  --dump-spirv test.vert
                               FunctionEnd
 ```
 
-## Mesa
+## Mesa GLSL compiler
 
 Welcome to Mesa's GLSL compiler.  A brief overview of how things flow:
 
