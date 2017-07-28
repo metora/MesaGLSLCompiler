@@ -204,7 +204,6 @@
     <ClInclude Include="..\..\src\mesa\main\macros.h" />
     <ClInclude Include="..\..\src\mesa\main\mtypes.h" />
     <ClInclude Include="..\..\src\mesa\main\shaderobj.h" />
-    <ClInclude Include="..\..\src\mesa\main\uniforms.h" />
     <ClInclude Include="..\..\src\mesa\program\prog_instruction.h" />
     <ClInclude Include="..\..\src\mesa\program\prog_parameter.h" />
     <ClInclude Include="..\..\src\mesa\program\prog_statevars.h" />

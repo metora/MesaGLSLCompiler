@@ -210,7 +210,7 @@ ir_print_spirv_visitor::ir_print_spirv_visitor(spirv_buffer *f)
 {
    indentation = 0;
    printable_names =
-      _mesa_hash_table_create(NULL, _mesa_hash_pointer, _mesa_key_pointer_equal);
+      _mesa_hash_table_create(NULL, _mesa_key_hash_string, _mesa_key_string_equal);
    mem_ctx = ralloc_context(NULL);
 }
 
