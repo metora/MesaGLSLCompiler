@@ -116,9 +116,9 @@ linked in.
 shader program and producing a compiled program for each stage.  See
 ../mesa/program/ir_to_mesa.cpp for Mesa IR code generation.
 
-FAQ:
+### FAQ:
 
-Q: What is HIR versus IR versus LIR?
+#### Q: What is HIR versus IR versus LIR?
 
 A: The idea behind the naming was that ast_to_hir would produce a
 high-level IR ("HIR"), with things like matrix operations, structure
@@ -143,7 +143,7 @@ out of favor, and each driver will perform a series of lowering passes
 to take the HIR down to whatever restrictions it wants to impose
 before doing codegen.
 
-Q: How is the IR structured?
+#### Q: How is the IR structured?
 
 A: The best way to get started seeing it would be to run the
 standalone compiler against a shader:
@@ -211,7 +211,7 @@ are easier.  This comes at the expense of additional trickery in
 implementing some optimizations like CSE where one must navigate
 an expression tree.
 
-Q: Why no SSA representation?
+#### Q: Why no SSA representation?
 
 A: Converting an IR tree to SSA form makes dead code elimination,
 common subexpression elimination, and many other optimizations much
@@ -240,7 +240,7 @@ IR backend, SSA does not appear to be that important to producing
 excellent code, but we do expect to do some SSA-based optimizations
 for the 965 fragment shader backend when that is developed.
 
-Q: How should I expand instructions that take multiple backend instructions?
+#### Q: How should I expand instructions that take multiple backend instructions?
 
 Sometimes you'll have to do the expansion in your code generation --
 see, for example, ir_to_mesa.cpp's handling of ir_unop_sqrt.  However,
@@ -252,7 +252,7 @@ instruction, not a divide.  Implementing non-native instructions this
 way gives the chance for constant folding to occur, so (a / 2.0)
 becomes (a * 0.5) after codegen instead of (a * (1.0 / 2.0))
 
-Q: How shoud I handle my special hardware instructions with respect to IR?
+#### Q: How shoud I handle my special hardware instructions with respect to IR?
 
 Our current theory is that if multiple targets have an instruction for
 some operation, then we should probably be able to represent that in
@@ -276,7 +276,7 @@ You can then use the new expression from builtins (if all backends
 would rather see it), or scan the IR and convert to use your new
 expression type (see ir_mod_to_floor, for example).
 
-Q: How is memory management handled in the compiler?
+#### Q: How is memory management handled in the compiler?
 
 The hierarchical memory allocator "talloc" developed for the Samba
 project is used, so that things like optimization passes don't have to
@@ -302,7 +302,7 @@ result of the first talloc_parent().  Cleaning up all the optimization
 passes to take a context argument and not call talloc_parent() is left
 as an exercise.
 
-Q: What is the file naming convention in this directory?
+#### Q: What is the file naming convention in this directory?
 
 Initially, there really wasn't one.  We have since adopted one:
 
