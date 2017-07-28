@@ -147,16 +147,17 @@ Q: How is the IR structured?
 
 A: The best way to get started seeing it would be to run the
 standalone compiler against a shader:
-
+```
 ./glsl_compiler --dump-lir \
 	~/src/piglit/tests/shaders/glsl-orangebook-ch06-bump.frag
-
+```
 So for example one of the ir_instructions in main() contains:
-
+```
 (assign (constant bool (1)) (var_ref litColor)  (expression vec3 * (var_ref Surf
 aceColor) (var_ref __retval) ) )
-
+```
 Or more visually:
+```
                      (assign)
                  /       |        \
         (var_ref)  (expression *)  (constant bool 1)
@@ -164,11 +165,11 @@ Or more visually:
 (litColor)      (var_ref)    (var_ref)
                   /                  \
            (SurfaceColor)          (__retval)
-
+```
 which came from:
-
+```
 litColor = SurfaceColor * max(dot(normDelta, LightDir), 0.0);
-
+```
 (the max call is not represented in this expression tree, as it was a
 function call that got inlined but not brought into this expression
 tree)
@@ -177,11 +178,11 @@ Each of those nodes is a subclass of ir_instruction.  A particular
 ir_instruction instance may only appear once in the whole IR tree with
 the exception of ir_variables, which appear once as variable
 declarations:
-
+```
 (declare () vec3 normDelta)
-
+```
 and multiple times as the targets of variable dereferences:
-...
+```
 (assign (constant bool (1)) (var_ref __retval) (expression float dot
  (var_ref normDelta) (var_ref LightDir) ) )
 ...
@@ -189,20 +190,26 @@ and multiple times as the targets of variable dereferences:
  (var_ref LightDir) (expression vec3 * (constant float (2.000000))
  (expression vec3 * (expression float dot (var_ref normDelta) (var_ref
  LightDir) ) (var_ref normDelta) ) ) ) )
-...
+```
 
 Each node has a type.  Expressions may involve several different types:
+```
 (declare (uniform ) mat4 gl_ModelViewMatrix)
 ((assign (constant bool (1)) (var_ref constructor_tmp) (expression
  vec4 * (var_ref gl_ModelViewMatrix) (var_ref gl_Vertex) ) )
-
+```
 An expression tree can be arbitrarily deep, and the compiler tries to
-keep them structured like that so that things like algebraic
-optimizations ((color * 1.0 == color) and ((mat1 * mat2) * vec == mat1
-* (mat2 * vec))) or recognizing operation patterns for code generation
-(vec1 * vec2 + vec3 == mad(vec1, vec2, vec3)) are easier.  This comes
-at the expense of additional trickery in implementing some
-optimizations like CSE where one must navigate an expression tree.
+keep them structured like that so that things like algebraic optimizations
+```
+((color * 1.0 == color) and ((mat1 * mat2) * vec == mat1 * (mat2 * vec)))
+```
+or recognizing operation patterns for code generation
+```
+(vec1 * vec2 + vec3 == mad(vec1, vec2, vec3))
+```
+are easier.  This comes at the expense of additional trickery in
+implementing some optimizations like CSE where one must navigate
+an expression tree.
 
 Q: Why no SSA representation?
 
@@ -213,11 +220,11 @@ major questions as to how it would work.  Do we do SSA on the scalar
 or vector level?  If we do it at the vector level, we're going to end
 up with many different versions of the variable when encountering code
 like:
-
+```
 (assign (constant bool (1)) (swiz x (var_ref __retval) ) (var_ref a) )
 (assign (constant bool (1)) (swiz y (var_ref __retval) ) (var_ref b) )
 (assign (constant bool (1)) (swiz z (var_ref __retval) ) (var_ref c) )
-
+```
 If every masked update of a component relies on the previous value of
 the variable, then we're probably going to be quite limited in our
 dead code elimination wins, and recognizing common expressions may
@@ -255,16 +262,16 @@ floor(a)), but both 945 and 965 have instructions to give that result,
 and it would also simplify the implementation of mod(), so
 ir_unop_fract was added.  The following areas need updating to add a
 new expression type:
-
+```
 ir.h (new enum)
 ir.cpp:operator_strs (used for ir_reader)
 ir_constant_expression.cpp (you probably want to be able to constant fold)
 ir_validate.cpp (check users have the right types)
-
+```
 You may also need to update the backends if they will see the new expr type:
-
+```
 ../mesa/program/ir_to_mesa.cpp
-
+```
 You can then use the new expression from builtins (if all backends
 would rather see it), or scan the IR and convert to use your new
 expression type (see ir_mod_to_floor, for example).
