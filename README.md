@@ -1,5 +1,7 @@
 # Mesa GLSL Compiler
 
+### Usage
+```
 usage: compiler.EXE [options] <file.vert | file.tesc | file.tese | file.geom | file.frag | file.comp>
 
 Possible options are:
@@ -13,22 +15,19 @@ Possible options are:
     --link
     --just-log
     --version
+```
 
-### test.vert
-
+### Example
 ```
 #version 300 es
-                                                                                                                                                                                                                                                               
+
 in vec3 Position;
 
 void main()
 {
   gl_Position = vec4(Position, 1.0);
 }
-```
 
-### Example
-```
 C:\>Compiler.exe --version 120  --dump-spirv test.vert
 
 // Module Version 10100
