@@ -144,7 +144,7 @@ private:
 
 extern "C" {
 void
-_mesa_print_spirv(spirv_buffer *f, exec_list *instructions, gl_shader_stage stage);
+_mesa_print_spirv(spirv_buffer *f, exec_list *instructions, gl_shader_stage stage, unsigned version, bool es);
 }
 
 #endif /* IR_PRINT_SPIRV_VISITOR_H */

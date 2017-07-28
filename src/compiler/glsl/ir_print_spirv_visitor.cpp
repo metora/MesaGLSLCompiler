@@ -87,7 +87,7 @@ spirv_buffer::~spirv_buffer()
 
 extern "C" {
 void
-_mesa_print_spirv(spirv_buffer *f, exec_list *instructions, gl_shader_stage stage)
+_mesa_print_spirv(spirv_buffer *f, exec_list *instructions, gl_shader_stage stage, unsigned version, bool es)
 {
    f->id = 1;
    f->binding_id = 0;
@@ -173,8 +173,8 @@ _mesa_print_spirv(spirv_buffer *f, exec_list *instructions, gl_shader_stage stag
 
    // Source ESSL 310
    f->push(SpvOpSource | (3 << SpvWordCountShift));
-   f->push(SpvSourceLanguageESSL);
-   f->push(310u);
+   f->push(es ? SpvSourceLanguageESSL : SpvSourceLanguageGLSL);
+   f->push(version);
 
    for (unsigned int i = 0; i < f->names.count(); ++i) {
       f->push(f->names[i]);

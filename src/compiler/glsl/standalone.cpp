@@ -598,7 +598,7 @@ standalone_compile_shader(const struct standalone_options *_options,
                continue;
 
             spirv_buffer buffer;
-            _mesa_print_spirv(&buffer, shader->ir, gl_shader_stage(i));
+            _mesa_print_spirv(&buffer, shader->ir, gl_shader_stage(i), whole_program->Shaders[0]->Version, whole_program->IsES);
             spv::Disassemble(std::cout, std::vector<unsigned int>(buffer.data(), buffer.data() + buffer.count()));
 
             if (options->dump_spirv_glsl) {
@@ -608,7 +608,7 @@ standalone_compile_shader(const struct standalone_options *_options,
 
                // Set some options.
                spirv_cross::CompilerGLSL::Options options;
-               options.version = whole_program->Shaders[i]->Version;
+               options.version = whole_program->Shaders[0]->Version;
                options.es = whole_program->IsES;
                glsl.set_options(options);
 
