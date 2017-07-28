@@ -15,6 +15,8 @@ Possible options are:
     --version
 
 ### test.vert
+
+```
 #version 300 es
                                                                                                                                                                                                                                                                
 in vec3 Position;
@@ -23,7 +25,10 @@ void main()
 {
   gl_Position = vec4(Position, 1.0);
 }
+```
 
+### Example
+```
 C:\>Compiler.exe --version 120  --dump-spirv test.vert
 
 // Module Version 10100
@@ -70,6 +75,7 @@ C:\>Compiler.exe --version 120  --dump-spirv test.vert
                               Store 24(gl_Position) 14(vec_ctor)
                               Return
                               FunctionEnd
+```
 
 ## Mesa
 
