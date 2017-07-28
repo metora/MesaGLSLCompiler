@@ -170,6 +170,7 @@
     <ClCompile Include="..\..\src\util\strtod.c">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\src\util\u_vector.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\compiler\glsl\ir_array_refcount.h" />
@@ -266,6 +267,7 @@
     <ClInclude Include="..\..\src\util\set.h" />
     <ClInclude Include="..\..\src\util\strndup.h" />
     <ClInclude Include="..\..\src\util\strtod.h" />
+    <ClInclude Include="..\..\src\util\u_vector.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5A0CDE64-327D-4E77-ABD2-0F7CEE552CE8}</ProjectGuid>

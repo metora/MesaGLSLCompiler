@@ -597,15 +597,14 @@ standalone_compile_shader(const struct standalone_options *_options,
             if (!shader)
                continue;
 
-            static unsigned int temp[65536];
-            spirv_buffer buffer(temp, sizeof(temp));
+            spirv_buffer buffer;
             _mesa_print_spirv(&buffer, shader->ir, gl_shader_stage(i));
-            spv::Disassemble(std::cout, std::vector<unsigned int>(temp, temp + buffer.count()));
+            spv::Disassemble(std::cout, std::vector<unsigned int>(buffer.data(), buffer.data() + buffer.count()));
 
             if (options->dump_spirv_glsl) {
 
                // Read SPIR-V from.
-               spirv_cross::CompilerGLSL glsl(std::vector<unsigned int>(temp, temp + buffer.count()));
+               spirv_cross::CompilerGLSL glsl(std::vector<unsigned int>(buffer.data(), buffer.data() + buffer.count()));
 
                // Set some options.
                spirv_cross::CompilerGLSL::Options options;

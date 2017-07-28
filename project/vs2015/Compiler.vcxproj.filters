@@ -330,6 +330,9 @@
     <ClInclude Include="..\..\src\compiler\spirv\spirv.hpp">
       <Filter>src\compiler\spirv</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\util\u_vector.h">
+      <Filter>src\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\compiler\glsl_types.cpp">
@@ -712,6 +715,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\compiler\spirv\spirv_glsl.cpp">
       <Filter>src\compiler\spirv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\util\u_vector.c">
+      <Filter>src\util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
