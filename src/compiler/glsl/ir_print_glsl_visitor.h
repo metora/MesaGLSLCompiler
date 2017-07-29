@@ -31,18 +31,20 @@
 
 extern "C" {
 #include "program/symbol_table.h"
+#include "util/u_vector.h"
 }
 
 class string_buffer {
 public:
-   string_buffer(char* buf, size_t size);
+   string_buffer();
+   virtual ~string_buffer();
    void printf(const char* format, ...);
    const char* string() const;
-   size_t offset() const;
+   unsigned int offset() const;
 protected:
    char* buf;
-   size_t step;
-   const size_t size;
+   unsigned int step;
+   unsigned int capacity;
 };
 
 /**

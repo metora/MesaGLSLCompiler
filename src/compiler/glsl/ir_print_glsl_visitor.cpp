@@ -27,19 +27,39 @@
 #include "main/macros.h"
 #include "util/hash_table.h"
 
-string_buffer::string_buffer(char* buf, size_t size)
-   : buf(buf)
-   , step(0)
-   , size(size)
+string_buffer::string_buffer()
 {
-   buf[0] = '\0';
+   buf = (char*)malloc(1024);
+   step = 0;
+   if (buf) {
+      buf[0] = '\0';
+      capacity = 1024;
+   }
+   else {
+      capacity = 0;
+   }
+}
+
+string_buffer::~string_buffer()
+{
+   free(buf);
 }
 
 void string_buffer::printf(const char* format, ...) {
+
+   if (step + 1024 >= capacity) {
+      capacity += 1024;
+      buf = (char*)realloc(buf, capacity);
+      if (buf == NULL) {
+         capacity = 0;
+         return;
+      }
+   }
+
    va_list args;
 
    va_start(args, format);
-   size_t count = vsnprintf(buf + step, size - step, format, args);
+   size_t count = vsnprintf(buf + step, capacity - step, format, args);
    va_end(args);
 
    step += count;
@@ -49,7 +69,7 @@ const char* string_buffer::string() const {
    return buf;
 }
 
-size_t string_buffer::offset() const {
+unsigned int string_buffer::offset() const {
    return step;
 }
 

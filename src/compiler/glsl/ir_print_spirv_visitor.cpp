@@ -228,7 +228,8 @@ ir_print_spirv_visitor::unique_name(ir_variable *var)
       _mesa_hash_table_search(this->printable_names, var);
 
    if (entry != NULL) {
-      return (unsigned int)(intptr_t) entry->data;
+      var->ir_temp = (unsigned int)(intptr_t)entry->data;
+      return var->ir_temp;
    }
 
    unsigned int name_id = f->id++;
