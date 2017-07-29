@@ -31,7 +31,6 @@
 
 extern "C" {
 #include "program/symbol_table.h"
-#include "util/u_vector.h"
 }
 
 class string_buffer {

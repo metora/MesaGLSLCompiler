@@ -117,8 +117,8 @@ _mesa_print_spirv(spirv_buffer *f, exec_list *instructions, gl_shader_stage stag
    f->extensions.push(SpvAddressingModelLogical);
    f->extensions.push(SpvMemoryModelGLSL450);
 
+   ir_print_spirv_visitor v(f);
    foreach_in_list(ir_instruction, ir, instructions) {
-      ir_print_spirv_visitor v(f);
       ir->accept(&v);
    }
 
