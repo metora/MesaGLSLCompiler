@@ -225,7 +225,7 @@ ir_print_spirv_visitor::unique_name(ir_variable *var)
 
    /* Do we already have a name for this variable? */
    struct hash_entry * entry =
-      _mesa_hash_table_search(this->printable_names, var);
+      _mesa_hash_table_search(this->printable_names, var->name);
 
    if (entry != NULL) {
       var->ir_temp = (unsigned int)(intptr_t)entry->data;
@@ -246,7 +246,7 @@ ir_print_spirv_visitor::unique_name(ir_variable *var)
       f->decorates.push(SpvDecorationRelaxedPrecision);
    }
 
-   _mesa_hash_table_insert(this->printable_names, var, (void *)(intptr_t) name_id);
+   _mesa_hash_table_insert(this->printable_names, var->name, (void *)(intptr_t) name_id);
 
    return name_id;
 }
