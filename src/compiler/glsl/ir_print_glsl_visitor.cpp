@@ -367,6 +367,8 @@ static const char *const operator_glsl_strs[] = {
    "interpolate_at_centroid",
    "get_buffer_size",
    "ssbo_unsized_array_length",
+   "ballot",
+   "read_first_invocation",
    "vote_any",
    "vote_all",
    "vote_eq",
@@ -438,6 +440,8 @@ static bool is_binop_func_like(ir_expression_operation op, const glsl_type* type
 
 void ir_print_glsl_visitor::visit(ir_expression *ir)
 {
+   STATIC_ASSERT(ARRAY_SIZE(operator_glsl_strs) == ir_last_opcode);
+
    if (ir->get_num_operands() == 1) {
       if (ir->operation >= ir_unop_f2i && ir->operation <= ir_unop_d2b) {
          print_type(buf, ir->type, state->language_version);
