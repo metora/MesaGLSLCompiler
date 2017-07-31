@@ -58,8 +58,9 @@ public:
    binary_buffer types;
    binary_buffer uniforms;
    binary_buffer inouts;
-   binary_buffer functions;
    binary_buffer per_vertices;
+   binary_buffer builtins;
+   binary_buffer functions;
    binary_buffer reflections;
 
    unsigned int precision_float;

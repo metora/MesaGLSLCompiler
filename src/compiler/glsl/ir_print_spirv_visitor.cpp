@@ -187,6 +187,10 @@ _mesa_print_spirv(spirv_buffer *f, exec_list *instructions, gl_shader_stage stag
       f->push(f->decorates[i]);
    }
 
+   for (unsigned int i = 0; i < f->types.count(); ++i) {
+      f->push(f->types[i]);
+   }
+
    // gl_PerVertex
    unsigned int per_vertices_count = f->per_vertices.count();
    if (per_vertices_count != 0) {
@@ -197,8 +201,9 @@ _mesa_print_spirv(spirv_buffer *f, exec_list *instructions, gl_shader_stage stag
       }
    }
 
-   for (unsigned int i = 0; i < f->types.count(); ++i) {
-      f->push(f->types[i]);
+   // Built-in
+   for (unsigned int i = 0; i < f->builtins.count(); ++i) {
+      f->push(f->builtins[i]);
    }
 
    for (unsigned int i = 0; i < f->functions.count(); ++i) {
@@ -1052,26 +1057,32 @@ void ir_print_spirv_visitor::visit(ir_dereference_variable *ir)
             f->decorates.push(SpvDecorationBuiltIn);
             f->decorates.push(built_in);
 
+            unsigned int struct_pointer_id = f->id++;
+            f->builtins.push(SpvOpTypePointer | (4 << SpvWordCountShift));
+            f->builtins.push(struct_pointer_id);
+            f->builtins.push(SpvStorageClassOutput);
+            f->builtins.push(f->gl_per_vertex_id);
+
+            unsigned int type_id = visit_type(f, type);
             unsigned int type_pointer_id = f->id++;
-            f->types.push(SpvOpTypePointer | (4 << SpvWordCountShift));
-            f->types.push(type_pointer_id);
-            f->types.push(SpvStorageClassOutput);
-            f->types.push(f->gl_per_vertex_id);
+            f->builtins.push(SpvOpTypePointer | (4 << SpvWordCountShift));
+            f->builtins.push(type_pointer_id);
+            f->builtins.push(SpvStorageClassOutput);
+            f->builtins.push(type_id);
 
             unsigned int variable_id = f->id++;
-            f->types.push(SpvOpVariable | (4 << SpvWordCountShift));
-            f->types.push(type_pointer_id);
-            f->types.push(variable_id);
-            f->types.push(SpvStorageClassOutput);
+            f->builtins.push(SpvOpVariable | (4 << SpvWordCountShift));
+            f->builtins.push(struct_pointer_id);
+            f->builtins.push(variable_id);
+            f->builtins.push(SpvStorageClassOutput);
 
             unsigned int int_type_id = visit_type(f, glsl_type::int_type);
             unsigned int constant_id = f->id++;
-            f->types.push(SpvOpConstant | (4 << SpvWordCountShift));
-            f->types.push(int_type_id);
-            f->types.push(constant_id);
-            f->types.push(f->per_vertices.count());
+            f->builtins.push(SpvOpConstant | (4 << SpvWordCountShift));
+            f->builtins.push(int_type_id);
+            f->builtins.push(constant_id);
+            f->builtins.push(f->per_vertices.count());
 
-            unsigned int type_id = visit_type(f, type);
             f->per_vertices.push(type_id);
 
             unsigned int access_id = f->id++;
@@ -1155,16 +1166,40 @@ void ir_print_spirv_visitor::visit(ir_assignment *ir)
          f->functions.push(return_id);
          f->functions.push(ir->rhs->ir_temp);
          ir->lhs->ir_temp = ir->rhs->ir_temp;
-      }
-      else {
+      } else {
+         unsigned int vector1_id = ir->rhs->ir_temp;
+         unsigned int vector2_id = ir->lhs->ir_temp ? ir->lhs->ir_temp : vector1_id;
+         if (vector1_id != vector2_id && ir->lhs->type != ir->rhs->type) {
+            unsigned int result_id = f->id++;
+            ir_rvalue* less_ir;
+            ir_rvalue* more_ir;
+            if (ir->rhs->type->components() < ir->lhs->type->components()) {
+               less_ir = ir->rhs;
+               more_ir = ir->lhs;
+               vector1_id = result_id;
+            } else {
+               less_ir = ir->lhs;
+               more_ir = ir->rhs;
+               vector2_id = result_id;
+            }
+            unsigned int type_id = visit_type(f, more_ir->type);
+            f->functions.push(SpvOpVectorShuffle | ((5 + more_ir->type->components()) << SpvWordCountShift));
+            f->functions.push(type_id);
+            f->functions.push(result_id);
+            f->functions.push(less_ir->ir_temp);
+            f->functions.push(less_ir->ir_temp);
+            unsigned int component_index = 0;
+            for (unsigned int i = 0; i < more_ir->type->components(); ++i) {
+               f->functions.push(i < less_ir->type->components() ? i : less_ir->type->components() - 1);
+            }
+         }
          unsigned int type_id = visit_type(f, ir->lhs->type);
          unsigned int value_id = f->id++;
-         unsigned int source_id = ir->rhs->ir_temp;
          f->functions.push(SpvOpVectorShuffle | ((5 + ir->lhs->type->components()) << SpvWordCountShift));
          f->functions.push(type_id);
          f->functions.push(value_id);
-         f->functions.push(source_id);
-         f->functions.push(ir->lhs->ir_temp ? ir->lhs->ir_temp : source_id);
+         f->functions.push(vector1_id);
+         f->functions.push(vector2_id);
          unsigned int component_index = 0;
          for (unsigned int i = 0; i < ir->lhs->type->components(); ++i) {
 #if 1
@@ -1179,10 +1214,25 @@ void ir_print_spirv_visitor::visit(ir_assignment *ir)
          ir->lhs->ir_temp = value_id;
       }
    } else {
-      f->functions.push(SpvOpStore | (3 << SpvWordCountShift));
-      f->functions.push(ir->lhs->ir_temp);
-      f->functions.push(ir->rhs->ir_temp);
-      ir->lhs->ir_temp = ir->rhs->ir_temp;
+      if (ir->rhs->is_dereference()) {
+         unsigned int type_id = visit_type(f, ir->rhs->type);
+         unsigned int value_id = f->id++;
+         unsigned int pointer_id = ir->rhs->ir_temp;
+         f->functions.push(SpvOpLoad | (4 << SpvWordCountShift));
+         f->functions.push(type_id);
+         f->functions.push(value_id);
+         f->functions.push(pointer_id);
+
+         f->functions.push(SpvOpStore | (3 << SpvWordCountShift));
+         f->functions.push(ir->lhs->ir_temp);
+         f->functions.push(value_id);
+         ir->lhs->ir_temp = value_id;
+      } else {
+         f->functions.push(SpvOpStore | (3 << SpvWordCountShift));
+         f->functions.push(ir->lhs->ir_temp);
+         f->functions.push(ir->rhs->ir_temp);
+         ir->lhs->ir_temp = ir->rhs->ir_temp;
+      }
    }
 }
 
