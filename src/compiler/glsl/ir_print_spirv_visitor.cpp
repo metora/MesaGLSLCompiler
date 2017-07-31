@@ -599,7 +599,33 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
 {
    unsigned int return_id = visit_type(f, ir->type);
 
-   if (ir->operation >= ir_unop_bit_not && ir->operation <= ir_unop_vote_eq) {
+   if (ir->operation == ir_unop_saturate) {
+      if (ir->get_num_operands() != 1)
+         return;
+
+      if (ir->operands[0] == NULL)
+         return;
+      ir->operands[0]->accept(this);
+
+      ir_constant zero_ir(0.0f);
+      ir_constant one_ir(1.0f);
+      zero_ir.ir_temp = 0;
+      one_ir.ir_temp = 0;
+      visit(&zero_ir);
+      visit(&one_ir);
+
+      unsigned int value_id = f->id++;
+      f->functions.push(SpvOpExtInst | (8 << SpvWordCountShift));
+      f->functions.push(return_id);
+      f->functions.push(value_id);
+      f->functions.push(f->import_id);
+      f->functions.push(GLSLstd450FClamp);
+      f->functions.push(ir->operands[0]->ir_temp);
+      f->functions.push(zero_ir.ir_temp);
+      f->functions.push(one_ir.ir_temp);
+      ir->ir_temp = value_id;
+
+   } else if (ir->operation >= ir_unop_bit_not && ir->operation <= ir_unop_vote_eq) {
       if (ir->get_num_operands() != 1)
          return;
 
