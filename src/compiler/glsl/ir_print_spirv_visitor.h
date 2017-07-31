@@ -59,6 +59,7 @@ public:
    binary_buffer uniforms;
    binary_buffer inouts;
    binary_buffer functions;
+   binary_buffer per_vertices;
    binary_buffer reflections;
 
    unsigned int precision_float;
@@ -74,6 +75,10 @@ public:
    unsigned int uniform_offset;
    unsigned int function_id;
    unsigned int main_id;
+
+   unsigned int gl_per_vertex_id;
+   unsigned int gl_position_id;
+   unsigned int gl_point_size;
 
    unsigned int void_id;
    unsigned int bool_id;

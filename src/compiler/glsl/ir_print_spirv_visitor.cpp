@@ -98,6 +98,9 @@ _mesa_print_spirv(spirv_buffer *f, exec_list *instructions, gl_shader_stage stag
    f->uniform_offset = 0;
    f->function_id = 0;
    f->main_id = 0;
+   f->gl_per_vertex_id = 0;
+   f->gl_position_id = 0;
+   f->gl_point_size = 0;
    f->void_id = 0;
    f->bool_id = 0;
    memset(f->float_id, 0, sizeof(f->float_id));
@@ -182,6 +185,16 @@ _mesa_print_spirv(spirv_buffer *f, exec_list *instructions, gl_shader_stage stag
 
    for (unsigned int i = 0; i < f->decorates.count(); ++i) {
       f->push(f->decorates[i]);
+   }
+
+   // gl_PerVertex
+   unsigned int per_vertices_count = f->per_vertices.count();
+   if (per_vertices_count != 0) {
+      f->push(SpvOpTypeStruct | ((2 + per_vertices_count) << SpvWordCountShift));
+      f->push(f->gl_per_vertex_id);
+      for (unsigned int i = 0; i < f->per_vertices.count(); ++i) {
+         f->push(f->per_vertices[i]);
+      }
    }
 
    for (unsigned int i = 0; i < f->types.count(); ++i) {
@@ -346,6 +359,9 @@ unsigned int visit_type(spirv_buffer *f, const struct glsl_type *type)
 
 void ir_print_spirv_visitor::visit(ir_variable *ir)
 {
+   if (is_gl_identifier(ir->name))
+      return;
+
    unsigned int vector_id = visit_type(f, ir->type);
 
    const unsigned int mode[] = {
@@ -992,6 +1008,85 @@ void ir_print_spirv_visitor::visit(ir_dereference_variable *ir)
 
       ir->ir_temp = value_id;
    } else if (var->data.mode == ir_var_auto || var->data.mode == ir_var_shader_out || var->data.mode == ir_var_temporary) {
+
+      if (f->shader_stage != MESA_SHADER_FRAGMENT && is_gl_identifier(var->name)) {
+
+         if (f->gl_per_vertex_id == 0) {
+            f->gl_per_vertex_id = f->id++;
+            unsigned int len = (int)strlen("gl_PerVertex");
+            unsigned int count = (len + sizeof(int)) / sizeof(int);
+            f->names.push(SpvOpName | ((count + 2) << SpvWordCountShift));
+            f->names.push(f->gl_per_vertex_id);
+            f->names.push("gl_PerVertex");
+
+            f->decorates.push(SpvOpDecorate | (3 << SpvWordCountShift));
+            f->decorates.push(f->gl_per_vertex_id);
+            f->decorates.push(SpvDecorationBlock);
+         }
+
+         unsigned int* value_id = NULL;
+         const glsl_type* type = NULL;
+         SpvBuiltIn built_in;
+         if (strcmp(var->name, "gl_Position") == 0) {
+            value_id = &f->gl_position_id;
+            type = glsl_type::vec4_type;
+            built_in = SpvBuiltInPosition;
+         } else if (strcmp(var->name, "gl_PointSize") == 0) {
+            value_id = &f->gl_point_size;
+            type = glsl_type::float_type;
+            built_in = SpvBuiltInPointSize;
+         }
+
+         if (value_id && (*value_id) == 0) {
+
+            unsigned int len = (int)strlen(var->name);
+            unsigned int count = (len + sizeof(int)) / sizeof(int);
+            f->names.push(SpvOpMemberName | ((count + 3) << SpvWordCountShift));
+            f->names.push(f->gl_per_vertex_id);
+            f->names.push(f->per_vertices.count());
+            f->names.push(var->name);
+
+            f->decorates.push(SpvOpMemberDecorate | (5 << SpvWordCountShift));
+            f->decorates.push(f->gl_per_vertex_id);
+            f->decorates.push(f->per_vertices.count());
+            f->decorates.push(SpvDecorationBuiltIn);
+            f->decorates.push(built_in);
+
+            unsigned int type_pointer_id = f->id++;
+            f->types.push(SpvOpTypePointer | (4 << SpvWordCountShift));
+            f->types.push(type_pointer_id);
+            f->types.push(SpvStorageClassOutput);
+            f->types.push(f->gl_per_vertex_id);
+
+            unsigned int variable_id = f->id++;
+            f->types.push(SpvOpVariable | (4 << SpvWordCountShift));
+            f->types.push(type_pointer_id);
+            f->types.push(variable_id);
+            f->types.push(SpvStorageClassOutput);
+
+            unsigned int int_type_id = visit_type(f, glsl_type::int_type);
+            unsigned int constant_id = f->id++;
+            f->types.push(SpvOpConstant | (4 << SpvWordCountShift));
+            f->types.push(int_type_id);
+            f->types.push(constant_id);
+            f->types.push(f->per_vertices.count());
+
+            unsigned int type_id = visit_type(f, type);
+            f->per_vertices.push(type_id);
+
+            unsigned int access_id = f->id++;
+            f->functions.push(SpvOpAccessChain | (5 << SpvWordCountShift));
+            f->functions.push(type_pointer_id);
+            f->functions.push(access_id);
+            f->functions.push(variable_id);
+            f->functions.push(constant_id);
+
+            (*value_id) = access_id;
+         }
+
+         var->ir_temp = value_id ? (*value_id) : 0;
+      }
+
       ir->ir_temp = var->ir_temp;
    }
 
