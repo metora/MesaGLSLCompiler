@@ -936,7 +936,8 @@ void ir_print_spirv_visitor::visit(ir_swizzle *ir)
 void ir_print_spirv_visitor::visit(ir_dereference_variable *ir)
 {
    ir_variable *var = ir->variable_referenced();
-   unique_name(var);
+   if (var->data.mode != ir_var_uniform)
+      unique_name(var);
 
    if (var->data.mode == ir_var_uniform || var->data.mode == ir_var_shader_in) {
 
@@ -1143,9 +1144,15 @@ void ir_print_spirv_visitor::visit(ir_dereference_array *ir)
    unsigned int array_index_id = ir->array_index->ir_temp;
 
    unsigned int type_id = visit_type(f, ir->type);
+   unsigned int type_pointer_id = f->id++;
+   f->functions.push(SpvOpTypePointer | (4 << SpvWordCountShift));
+   f->functions.push(type_pointer_id);
+   f->functions.push(SpvStorageClassOutput);
+   f->functions.push(type_id);
+
    unsigned int return_id = f->id++;
    f->functions.push(SpvOpAccessChain | (5 << SpvWordCountShift));
-   f->functions.push(type_id);
+   f->functions.push(type_pointer_id);
    f->functions.push(return_id);
    f->functions.push(array_id);
    f->functions.push(array_index_id);
@@ -1181,9 +1188,15 @@ void ir_print_spirv_visitor::visit(ir_assignment *ir)
          visit(&const_ir);
 
          unsigned int type_id = visit_type(f, ir->rhs->type);
+         unsigned int type_pointer_id = f->id++;
+         f->functions.push(SpvOpTypePointer | (4 << SpvWordCountShift));
+         f->functions.push(type_pointer_id);
+         f->functions.push(SpvStorageClassOutput);
+         f->functions.push(type_id);
+
          unsigned int return_id = f->id++;
          f->functions.push(SpvOpAccessChain | (5 << SpvWordCountShift));
-         f->functions.push(type_id);
+         f->functions.push(type_pointer_id);
          f->functions.push(return_id);
          f->functions.push(ir->lhs->ir_temp);
          f->functions.push(const_ir.ir_temp);
@@ -1315,8 +1328,15 @@ void ir_print_spirv_visitor::visit(ir_constant *ir)
       unsigned int value_id = f->id++;
       unsigned int type_id = visit_type(f, ir->type);
       if (ids.count() == 1) {
-         f->functions.push(SpvOpVariable | (4 << SpvWordCountShift));
+
+         unsigned int type_pointer_id = f->id++;
+         f->functions.push(SpvOpTypePointer | (4 << SpvWordCountShift));
+         f->functions.push(type_pointer_id);
+         f->functions.push(SpvStorageClassOutput);
          f->functions.push(type_id);
+
+         f->functions.push(SpvOpVariable | (4 << SpvWordCountShift));
+         f->functions.push(type_pointer_id);
          f->functions.push(value_id);
          f->functions.push(SpvStorageClassFunction);
 
