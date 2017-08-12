@@ -344,29 +344,17 @@ unsigned int ir_print_spirv_visitor::visit_type(const struct glsl_type *type)
    unsigned int vector_id;
    unsigned int* ids;
    if (type->is_array()) {
+
+      ir_constant ir_array_size(type->array_size());
+      ir_array_size.ir_value = 0;
+      visit(&ir_array_size);
+
       unsigned int base_type_id = visit_type(type->fields.array);
-      unsigned int constant_id = 0;
-
-      if (type->array_size() < 16) {
-         constant_id = f->const_int_id[type->array_size()];
-      }
-      if (constant_id == 0) {
-         unsigned int int_type_id = visit_type(glsl_type::int_type);
-         constant_id = f->id++;
-         f->types.push(SpvOpConstant | (4 << SpvWordCountShift));
-         f->types.push(int_type_id);
-         f->types.push(constant_id);
-         f->types.push(type->array_size());
-      }
-      if (type->array_size() < 16) {
-         f->const_int_id[type->array_size()] = constant_id;
-      }
-
       vector_id = f->id++;
       f->types.push(SpvOpTypeArray | (4 << SpvWordCountShift));
       f->types.push(vector_id);
       f->types.push(base_type_id);
-      f->types.push(constant_id);
+      f->types.push(ir_array_size.ir_value);
 
       return vector_id;
    }
@@ -803,8 +791,6 @@ void ir_print_spirv_visitor::visit(ir_function *ir)
 
 void ir_print_spirv_visitor::visit(ir_expression *ir)
 {
-   unsigned int return_id = visit_type(ir->type);
-
    for (unsigned int i = 0; i < ir->get_num_operands(); ++i) {
 
       if (ir->operands[i] == NULL)
@@ -813,6 +799,8 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
 
       visit_value(ir->operands[i]);
    }
+
+   unsigned int return_id = visit_type(ir->type);
 
    if (ir->operation == ir_unop_saturate) {
       if (ir->get_num_operands() != 1)
@@ -1206,39 +1194,19 @@ void ir_print_spirv_visitor::visit(ir_dereference_variable *ir)
          ir->ir_value = value_id;
       } else if (var->data.mode == ir_var_uniform) {
 
-         unsigned int int_type_id = visit_type(glsl_type::int_type);
-         unsigned int access_id = f->id++;
-         unsigned int constant_id = 0;
-#if 0
-         if (var->ir_uniform < 16) {
-            constant_id = f->const_int_id[var->ir_uniform];
-         }
-         if (constant_id == 0) {
-            constant_id = f->id++;
-            f->types.push(SpvOpConstant | (4 << SpvWordCountShift));
-            f->types.push(int_type_id);
-            f->types.push(constant_id);
-            f->types.push(var->ir_uniform);
-         }
-         if (var->ir_uniform < 16) {
-            f->const_int_id[var->ir_uniform] = constant_id;
-         }
-#else
-         constant_id = f->id++;
-         f->types.push(SpvOpConstant | (4 << SpvWordCountShift));
-         f->types.push(int_type_id);
-         f->types.push(constant_id);
-         f->types.push(var->ir_uniform);
-#endif
+         ir_constant ir_uniform(var->ir_uniform);
+         ir_uniform.ir_value = 0;
+         visit(&ir_uniform);
 
          unsigned int uniform_type = visit_type(var->type);
          unsigned int type_pointer_id = visit_type_pointer(var->type, var->data.mode, uniform_type);
+         unsigned int access_id = f->id++;
 
          f->functions.push(SpvOpAccessChain | (5 << SpvWordCountShift));
          f->functions.push(type_pointer_id);
          f->functions.push(access_id);
          f->functions.push(f->uniform_id);
-         f->functions.push(constant_id);
+         f->functions.push(ir_uniform.ir_value);
 
          ir->ir_pointer = access_id;
       } else {
@@ -1342,8 +1310,10 @@ void ir_print_spirv_visitor::visit(ir_dereference_variable *ir)
 void ir_print_spirv_visitor::visit(ir_dereference_array *ir)
 {
    ir->array->accept(this);
-
    ir->array_index->accept(this);
+
+   visit_value(ir->array);
+   visit_value(ir->array_index);
 
    unsigned int type_id = visit_type(ir->type);
    unsigned int type_id_pointer = visit_type_pointer(ir->type, ir_var_auto, type_id);
@@ -1369,14 +1339,11 @@ void ir_print_spirv_visitor::visit(ir_assignment *ir)
       ir->condition->accept(this);
 
    ir->rhs->accept(this);
-
    ir->lhs->accept(this);
-
    visit_value(ir->rhs);
 
-   bool full_write = (_mesa_bitcount(ir->write_mask) == ir->lhs->type->components());
-
    unsigned int value_id;
+   bool full_write = (_mesa_bitcount(ir->write_mask) == ir->lhs->type->components());
    if (full_write && (ir->lhs->type->components() == ir->rhs->type->components())) {
 
       value_id = ir->rhs->ir_value;
