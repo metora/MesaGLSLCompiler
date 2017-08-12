@@ -68,6 +68,7 @@ public:
 
    unsigned int id;
    unsigned int binding_id;
+   unsigned int binding_start_id;
 
    unsigned int import_id;
    unsigned int uniform_struct_id;
@@ -87,6 +88,16 @@ public:
    unsigned int int_id[4*4];
    unsigned int const_float_id[16];
    unsigned int const_int_id[16];
+
+   unsigned int pointer_bool_id[12];
+   unsigned int pointer_float_id[12*4*4];
+   unsigned int pointer_int_id[12*4*4];
+   unsigned int pointer_sampler;
+
+   unsigned int input_loc;
+   unsigned int output_loc;
+
+   unsigned short descript_set_definition;
 
    gl_shader_stage shader_stage;
 };
@@ -139,8 +150,10 @@ private:
     */
    unsigned int unique_name(ir_variable *var);
 
+   int unique_name_number;
    /** A mapping from ir_variable * -> unique printable names. */
    hash_table *printable_names;
+   _mesa_symbol_table *symbols;
 
    void *mem_ctx;
    spirv_buffer *f;
@@ -150,7 +163,7 @@ private:
 
 extern "C" {
 void
-_mesa_print_spirv(spirv_buffer *f, exec_list *instructions, gl_shader_stage stage, unsigned version, bool es);
+_mesa_print_spirv(spirv_buffer *f, exec_list *instructions, gl_shader_stage stage, unsigned version, bool es, unsigned short descript_set_def, unsigned short uniform_start_binding);
 }
 
 #endif /* IR_PRINT_SPIRV_VISITOR_H */

@@ -607,7 +607,7 @@ standalone_compile_shader(const struct standalone_options *_options,
                continue;
 
             spirv_buffer buffer;
-            _mesa_print_spirv(&buffer, shader->ir, gl_shader_stage(i), whole_program->Shaders[0]->Version, whole_program->IsES);
+            _mesa_print_spirv(&buffer, shader->ir, gl_shader_stage(i), whole_program->Shaders[0]->Version, whole_program->IsES, 0, 0);
 
             std::vector<unsigned int> spirv_data(buffer.data(), buffer.data() + buffer.count());
             spv::Disassemble(std::cout, spirv_data);
