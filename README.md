@@ -1,4 +1,4 @@
-# Mesa GLSL and SPIR-V Generator
+# SPIR-V Generator
 
 ### Usage
 ```

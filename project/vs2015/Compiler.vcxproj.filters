@@ -192,9 +192,6 @@
     <ClInclude Include="..\..\include\no_extern_c.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\compiler\glsl\ir_print_glsl_visitor.h">
-      <Filter>src\compiler\glsl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\c11\threads.h">
       <Filter>include\c11</Filter>
     </ClInclude>
@@ -673,9 +670,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\compiler\glsl\glcpp\pp.c">
       <Filter>src\compiler\glsl\glcpp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\compiler\glsl\ir_print_glsl_visitor.cpp">
-      <Filter>src\compiler\glsl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\compiler\glsl\ir_print_spirv_visitor.cpp">
       <Filter>src\compiler\glsl</Filter>

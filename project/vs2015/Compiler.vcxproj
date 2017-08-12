@@ -56,7 +56,6 @@
     <ClCompile Include="..\..\src\compiler\glsl\ir_function_detect_recursion.cpp" />
     <ClCompile Include="..\..\src\compiler\glsl\ir_hierarchical_visitor.cpp" />
     <ClCompile Include="..\..\src\compiler\glsl\ir_hv_accept.cpp" />
-    <ClCompile Include="..\..\src\compiler\glsl\ir_print_glsl_visitor.cpp" />
     <ClCompile Include="..\..\src\compiler\glsl\ir_print_spirv_visitor.cpp" />
     <ClCompile Include="..\..\src\compiler\glsl\ir_print_visitor.cpp" />
     <ClCompile Include="..\..\src\compiler\glsl\ir_reader.cpp" />
@@ -238,7 +237,6 @@
     <ClInclude Include="..\..\src\compiler\glsl\ir_function_inlining.h" />
     <ClInclude Include="..\..\src\compiler\glsl\ir_hierarchical_visitor.h" />
     <ClInclude Include="..\..\src\compiler\glsl\ir_optimization.h" />
-    <ClInclude Include="..\..\src\compiler\glsl\ir_print_glsl_visitor.h" />
     <ClInclude Include="..\..\src\compiler\glsl\ir_print_visitor.h" />
     <ClInclude Include="..\..\src\compiler\glsl\ir_reader.h" />
     <ClInclude Include="..\..\src\compiler\glsl\ir_rvalue_visitor.h" />

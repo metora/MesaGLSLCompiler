@@ -41,7 +41,6 @@
 #include "linker.h"
 #include "glsl_parser_extras.h"
 #include "ir_builder_print_visitor.h"
-#include "ir_print_glsl_visitor.h"
 #include "ir_print_spirv_visitor.h"
 #include "compiler/spirv/disassemble.h"
 #include "compiler/spirv/spirv_glsl.hpp"
@@ -570,22 +569,6 @@ standalone_compile_shader(const struct standalone_options *_options,
          dead_variable_visitor dv;
          visit_list_elements(&dv, shader->ir);
          dv.remove_dead_variables();
-      }
-
-      if (options->dump_glsl) {
-         for (unsigned i = 0; i < MESA_SHADER_STAGES; i++) {
-            struct gl_linked_shader *shader = whole_program->_LinkedShaders[i];
-
-            if (!shader)
-               continue;
-
-            struct _mesa_glsl_parse_state *state =
-               new(shader) _mesa_glsl_parse_state(ctx, whole_program->Shaders[0]->Stage, shader);
-
-            string_buffer buffer;
-            _mesa_print_glsl(&buffer, shader->ir, state);
-            fprintf(stdout, "%s", buffer.string());
-         }
       }
 
       if (options->dump_builder) {

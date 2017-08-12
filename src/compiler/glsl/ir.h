@@ -90,8 +90,13 @@ class ir_instruction : public exec_node {
 public:
    enum ir_node_type ir_type;
 
-   unsigned int ir_temp;
-   unsigned int ir_temp2;
+   unsigned int ir_value;
+   unsigned int ir_pointer;
+
+   unsigned int ir_label;
+   unsigned int ir_label_break;
+
+   unsigned int ir_uniform;
    struct exec_node *parent;
 
    /**

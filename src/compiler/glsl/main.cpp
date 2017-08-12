@@ -43,7 +43,6 @@ const struct option compiler_opts[] = {
    { "dump-hir", no_argument, &options.dump_hir, 1 },
    { "dump-lir", no_argument, &options.dump_lir, 1 },
    { "dump-builder", no_argument, &options.dump_builder, 1 },
-   { "dump-glsl", no_argument, &options.dump_glsl, 1 },
    { "dump-spirv", no_argument, &options.dump_spirv, 1 },
    { "dump-spirv-glsl", no_argument, &options.dump_spirv_glsl, 1 },
    { "link",     no_argument, &options.do_link,  1 },
