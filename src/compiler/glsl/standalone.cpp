@@ -386,11 +386,6 @@ compile_shader(struct gl_context *ctx, struct gl_shader *shader)
    _mesa_glsl_compile_shader(ctx, shader, options->dump_ast,
                              options->dump_hir, true);
 
-   /* Print out the resulting IR */
-   if (!state->error && options->dump_lir) {
-      _mesa_print_ir(stdout, shader->ir, state);
-   }
-
    return;
 }
 
@@ -573,6 +568,17 @@ standalone_compile_shader(const struct standalone_options *_options,
          dead_variable_visitor dv;
          visit_list_elements(&dv, shader->ir);
          dv.remove_dead_variables();
+      }
+
+      if (options->dump_lir) {
+         for (unsigned i = 0; i < MESA_SHADER_STAGES; i++) {
+            struct gl_linked_shader *shader = whole_program->_LinkedShaders[i];
+
+            if (!shader)
+               continue;
+
+            _mesa_print_ir(stdout, shader->ir, NULL);
+         }
       }
 
       if (options->dump_builder) {
