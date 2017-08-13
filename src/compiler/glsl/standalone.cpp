@@ -46,6 +46,7 @@
 #include "compiler/spirv/spirv_glsl.hpp"
 #include "builtin_functions.h"
 #include "opt_add_neg_to_sub.h"
+#include "opt_mul_add_to_fma.h"
 
 class dead_variable_visitor : public ir_hierarchical_visitor {
 public:
@@ -563,8 +564,11 @@ standalone_compile_shader(const struct standalone_options *_options,
          if (!shader)
             continue;
 
-         add_neg_to_sub_visitor v;
-         visit_list_elements(&v, shader->ir);
+         add_neg_to_sub_visitor av;
+         visit_list_elements(&av, shader->ir);
+
+         mul_add_to_fma_visitor mv;
+         visit_list_elements(&mv, shader->ir);
 
          dead_variable_visitor dv;
          visit_list_elements(&dv, shader->ir);

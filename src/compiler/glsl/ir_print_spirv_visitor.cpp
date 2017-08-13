@@ -450,7 +450,7 @@ unsigned int ir_print_spirv_visitor::visit_type_pointer(const struct glsl_type *
    }
 
    unsigned int vector_id;
-   unsigned int* ids = NULL;
+   unsigned int* ids;
    if (type->is_array()) {
       if (type->fields.array->is_float()) {
          ids = f->pointer_float_id;

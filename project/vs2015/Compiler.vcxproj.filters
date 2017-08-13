@@ -330,6 +330,9 @@
     <ClInclude Include="..\..\src\util\u_vector.h">
       <Filter>src\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\compiler\glsl\opt_mul_add_to_fma.h">
+      <Filter>src\compiler\glsl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\compiler\glsl_types.cpp">
