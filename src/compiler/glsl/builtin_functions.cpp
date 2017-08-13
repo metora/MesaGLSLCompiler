@@ -885,6 +885,7 @@ private:
    B1(bitCount)
    B1(findLSB)
    B1(findMSB)
+   BA1(saturate)
    BA1(fma)
    B2(ldexp)
    B2(frexp)
@@ -2863,6 +2864,7 @@ builtin_builder::create_builtins()
    IU(bitCount)
    IU(findLSB)
    IU(findMSB)
+   FD(saturate)
    FDGS5(fma)
 
    add_function("ldexp",
@@ -5458,6 +5460,8 @@ builtin_builder::_findMSB(const glsl_type *type)
    return unop(gpu_shader5_or_es31_or_integer_functions, ir_unop_find_msb,
                glsl_type::ivec(type->vector_elements), type);
 }
+
+UNOPA(saturate,  ir_unop_saturate)
 
 ir_function_signature *
 builtin_builder::_fma(builtin_available_predicate avail, const glsl_type *type)
