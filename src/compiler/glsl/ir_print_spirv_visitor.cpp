@@ -849,6 +849,7 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
       case ir_unop_sign:
       case ir_unop_rsq:
       case ir_unop_sqrt:
+      case ir_unop_normalize:
       case ir_unop_exp:
       case ir_unop_log:
       case ir_unop_exp2:
@@ -870,6 +871,7 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
          case ir_unop_sign:      f->functions.push(GLSLstd450FSign);       break;
          case ir_unop_rsq:       f->functions.push(GLSLstd450InverseSqrt); break;
          case ir_unop_sqrt:      f->functions.push(GLSLstd450Sqrt);        break;
+         case ir_unop_normalize: f->functions.push(GLSLstd450Normalize);   break;
          case ir_unop_exp:       f->functions.push(GLSLstd450Exp);         break;
          case ir_unop_log:       f->functions.push(GLSLstd450Log);         break;
          case ir_unop_exp2:      f->functions.push(GLSLstd450Exp2);        break;

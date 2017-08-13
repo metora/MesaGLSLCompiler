@@ -544,6 +544,7 @@ ir_builder_print_visitor::print_without_declaration(const ir_expression *ir)
       "", "unop", "binop", "triop", "quadop"
    };
 
+   STATIC_ASSERT(ARRAY_SIZE(ir_expression_operation_enum_strings) == ir_last_opcode + 1);
    switch (ir->operation) {
    case ir_unop_neg:
    case ir_binop_add:

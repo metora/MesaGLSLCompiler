@@ -274,6 +274,7 @@ void ir_print_visitor::visit(ir_expression *ir)
 
    print_type(f, ir->type);
 
+   STATIC_ASSERT(ARRAY_SIZE(ir_expression_operation_strings) == ir_last_opcode + 1);
    fprintf(f, " %s ", ir_expression_operation_strings[ir->operation]);
 
    for (unsigned i = 0; i < ir->get_num_operands(); i++) {

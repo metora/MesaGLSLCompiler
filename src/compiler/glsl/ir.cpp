@@ -229,6 +229,7 @@ ir_expression::ir_expression(int op, ir_rvalue *op0)
    case ir_unop_rcp:
    case ir_unop_rsq:
    case ir_unop_sqrt:
+   case ir_unop_normalize:
    case ir_unop_exp:
    case ir_unop_log:
    case ir_unop_exp2:

@@ -4355,7 +4355,7 @@ builtin_builder::_normalize(builtin_available_predicate avail, const glsl_type *
    if (type->vector_elements == 1) {
       body.emit(ret(sign(x)));
    } else {
-      body.emit(ret(mul(x, rsq(dot(x, x)))));
+      body.emit(ret(expr(ir_unop_normalize, x)));
    }
 
    return sig;

@@ -146,6 +146,35 @@
       }
       break;
 
+   case ir_unop_normalize:
+      switch (op[0]->type->base_type) {
+      case GLSL_TYPE_FLOAT: {
+         float total = 0.0f;
+         for (unsigned c = 0; c < op[0]->type->components(); c++) {
+            total += op[0]->value.f[c] * op[0]->value.f[c];
+         }
+         float invTotal = (total == 0.0f) ? 0.0f : 1.0f / sqrtf(total);
+         for (unsigned c = 0; c < op[0]->type->components(); c++) {
+            data.f[c] = op[0]->value.f[c] * invTotal;
+         }
+         break;
+      }
+      case GLSL_TYPE_DOUBLE: {
+         double total = 0.0;
+         for (unsigned c = 0; c < op[0]->type->components(); c++) {
+            total += op[0]->value.d[c] * op[0]->value.d[c];
+         }
+         double invTotal = (total == 0.0) ? 0.0 : 1.0 / sqrt(total);
+         for (unsigned c = 0; c < op[0]->type->components(); c++) {
+            data.d[c] = op[0]->value.d[c] * invTotal;
+         }
+         break;
+      }
+      default:
+         unreachable("invalid type");
+      }
+      break;
+
    case ir_unop_exp:
       for (unsigned c = 0; c < op[0]->type->components(); c++) {
          switch (op[0]->type->base_type) {

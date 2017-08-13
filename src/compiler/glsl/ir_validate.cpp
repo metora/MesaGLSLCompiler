@@ -261,6 +261,7 @@ ir_validate::visit_leave(ir_expression *ir)
    case ir_unop_rcp:
    case ir_unop_rsq:
    case ir_unop_sqrt:
+   case ir_unop_normalize:
       assert(ir->type->base_type == GLSL_TYPE_FLOAT ||
              ir->type->base_type == GLSL_TYPE_DOUBLE);
       assert(ir->type == ir->operands[0]->type);
