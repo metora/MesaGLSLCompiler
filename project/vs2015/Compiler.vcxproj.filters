@@ -716,5 +716,8 @@
     <ClCompile Include="..\..\src\util\u_vector.c">
       <Filter>src\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\compiler\glsl\opt_dead_variable.cpp">
+      <Filter>src\compiler\glsl</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

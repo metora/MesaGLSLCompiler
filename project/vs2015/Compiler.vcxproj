@@ -118,6 +118,7 @@
     <ClCompile Include="..\..\src\compiler\glsl\opt_dead_code.cpp" />
     <ClCompile Include="..\..\src\compiler\glsl\opt_dead_code_local.cpp" />
     <ClCompile Include="..\..\src\compiler\glsl\opt_dead_functions.cpp" />
+    <ClCompile Include="..\..\src\compiler\glsl\opt_dead_variable.cpp" />
     <ClCompile Include="..\..\src\compiler\glsl\opt_flatten_nested_if_blocks.cpp" />
     <ClCompile Include="..\..\src\compiler\glsl\opt_flip_matrices.cpp" />
     <ClCompile Include="..\..\src\compiler\glsl\opt_function_inlining.cpp" />

@@ -565,9 +565,7 @@ standalone_compile_shader(const struct standalone_options *_options,
          mul_add_to_fma_visitor mv;
          visit_list_elements(&mv, shader->ir);
 
-         dead_variable_visitor dv;
-         visit_list_elements(&dv, shader->ir);
-         dv.remove_dead_variables();
+         do_dead_variables(shader->ir);
       }
 
       if (options->dump_lir) {
