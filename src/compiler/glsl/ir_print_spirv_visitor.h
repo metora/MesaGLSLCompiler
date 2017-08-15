@@ -88,11 +88,12 @@ public:
    unsigned int int_id[4*4];
    unsigned int const_float_id[16];
    unsigned int const_int_id[16];
+   unsigned int sampler_id[16];
 
    unsigned int pointer_bool_id[12];
    unsigned int pointer_float_id[12*4*4];
    unsigned int pointer_int_id[12*4*4];
-   unsigned int pointer_sampler;
+   unsigned int pointer_sampler_id[16];
 
    unsigned int input_loc;
    unsigned int output_loc;
@@ -146,6 +147,7 @@ protected:
    char check_point_to_type(const struct glsl_type *type, unsigned int point_to);
    unsigned int visit_type_pointer(const struct glsl_type *type, unsigned int mode, unsigned int point_to);
    void visit_value(ir_rvalue *ir);
+   void visit_precision(unsigned int id, unsigned int type, unsigned int precision);
 
 private:
    /**
