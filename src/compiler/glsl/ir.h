@@ -92,11 +92,11 @@ public:
 
    unsigned int ir_value;
    unsigned int ir_pointer;
-
    unsigned int ir_label;
    unsigned int ir_label_break;
-
    unsigned int ir_uniform;
+   unsigned int ir_initialized;
+
    struct exec_node *parent;
 
    /**

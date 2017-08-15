@@ -79,8 +79,6 @@ public:
    unsigned int main_id;
 
    unsigned int gl_per_vertex_id;
-   unsigned int gl_position_id;
-   unsigned int gl_point_size;
 
    unsigned int void_id;
    unsigned int bool_id;
