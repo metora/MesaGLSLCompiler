@@ -173,13 +173,23 @@ _mesa_print_spirv(spirv_buffer *f, exec_list *instructions, gl_shader_stage stag
    f->extensions.push(SpvAddressingModelLogical);
    f->extensions.push(SpvMemoryModelGLSL450);
 
-   f->main_id = f->id++;
+   // spirv visitor
+   ir_print_spirv_visitor v(f);
+
+   // collect uniform type
+   foreach_in_list(ir_instruction, ir, instructions) {
+      ir_variable* var = ir->as_variable();
+      if (var) {
+         v.visit_type(var->type);
+      }
+   }
 
    // collect uniform
-   ir_print_spirv_visitor v(f);
    foreach_in_list(ir_instruction, ir, instructions) {
-      if (ir->as_variable())
-         ir->accept(&v);
+      ir_variable* var = ir->as_variable();
+      if (var && var->data.mode == ir_var_uniform && var->type->is_sampler() == false) {
+         var->accept(&v);
+      }
    }
 
    unsigned int uniforms_count = f->uniforms.count();
@@ -199,6 +209,14 @@ _mesa_print_spirv(spirv_buffer *f, exec_list *instructions, gl_shader_stage stag
       f->types.push(f->uniform_pointer_id);
       f->types.push(f->uniform_id);
       f->types.push(SpvStorageClassUniform);
+   }
+
+   // collect non-uniform
+   foreach_in_list(ir_instruction, ir, instructions) {
+      ir_variable* var = ir->as_variable();
+      if (var && (var->data.mode != ir_var_uniform || var->type->is_sampler() == true)) {
+         var->accept(&v);
+      }
    }
 
    foreach_in_list(ir_instruction, ir, instructions) {
@@ -352,8 +370,7 @@ unsigned int ir_print_spirv_visitor::visit_type(const struct glsl_type *type)
          f->types.push(SpvOpTypeImage | (9 << SpvWordCountShift));
          f->types.push(image_id);
          f->types.push(type_id);
-         switch (type->sampler_dimensionality)
-         {
+         switch (type->sampler_dimensionality) {
             case GLSL_SAMPLER_DIM_1D:        f->types.push(SpvDim1D);          break;
             case GLSL_SAMPLER_DIM_2D:        f->types.push(SpvDim2D);          break;
             case GLSL_SAMPLER_DIM_3D:        f->types.push(SpvDim3D);          break;
@@ -491,23 +508,7 @@ unsigned int ir_print_spirv_visitor::visit_type_pointer(const struct glsl_type *
    unsigned int vector_id;
    unsigned int* ids;
    if (type->is_array()) {
-      if (type->fields.array->is_float()) {
-         ids = f->pointer_float_id;
-      } else if (type->fields.array->is_integer()) {
-         ids = f->pointer_int_id;
-      } else if (type->fields.array->is_boolean()) {
-         if (f->pointer_bool_id[mode] == 0) {
-            f->pointer_bool_id[mode] = f->id++;
-            f->types.push(SpvOpTypePointer | (4 << SpvWordCountShift));
-            f->types.push(f->pointer_bool_id[mode]);
-            f->types.push(storage_mode[mode]);
-            f->types.push(point_to);
-         }
-         return f->pointer_bool_id[mode];
-      } else {
-         return 0;
-      }
-      type = type->fields.array;
+      return visit_type_pointer(type->fields.array, mode, point_to);
    } else if (type->is_float()) {
       ids = f->pointer_float_id;
    } else if (type->is_integer()) {
@@ -555,15 +556,34 @@ unsigned int ir_print_spirv_visitor::visit_type_pointer(const struct glsl_type *
 
 void ir_print_spirv_visitor::visit_value(ir_rvalue *ir)
 {
-   if (ir->ir_value == 0 && ir->ir_pointer != 0) {
-      unsigned int type_id = visit_type(ir->type);
-      unsigned int value_id = f->id++;
-      f->functions.push(SpvOpLoad | (4 << SpvWordCountShift));
-      f->functions.push(type_id);
-      f->functions.push(value_id);
-      f->functions.push(ir->ir_pointer);
-      ir->ir_value = value_id;
-      visit_precision(ir->ir_value, ir->type->base_type, GLSL_PRECISION_NONE);
+   if (ir->ir_value == 0) {
+      if (ir->ir_pointer == 0 && ir->ir_uniform) {
+         ir_constant ir_uniform(ir->ir_uniform - 1);
+         ir_uniform.ir_value = 0;
+         visit(&ir_uniform);
+
+         unsigned int uniform_type = visit_type(ir->type);
+         unsigned int type_pointer_id = visit_type_pointer(ir->type, ir_var_uniform, uniform_type);
+         unsigned int access_id = f->id++;
+
+         f->functions.push(SpvOpAccessChain | (5 << SpvWordCountShift));
+         f->functions.push(type_pointer_id);
+         f->functions.push(access_id);
+         f->functions.push(f->uniform_id);
+         f->functions.push(ir_uniform.ir_value);
+
+         ir->ir_pointer = access_id;
+      }
+      if (ir->ir_pointer != 0) {
+         unsigned int type_id = visit_type(ir->type);
+         unsigned int value_id = f->id++;
+         f->functions.push(SpvOpLoad | (4 << SpvWordCountShift));
+         f->functions.push(type_id);
+         f->functions.push(value_id);
+         f->functions.push(ir->ir_pointer);
+         ir->ir_value = value_id;
+         visit_precision(ir->ir_value, ir->type->base_type, GLSL_PRECISION_NONE);
+      }
    }
 }
 
@@ -595,13 +615,19 @@ void ir_print_spirv_visitor::visit(ir_variable *ir)
    if (is_gl_identifier(ir->name))
       return;
 
-   unsigned int vector_id = visit_type(ir->type);
+   unsigned int type_id = visit_type(ir->type);
 
    if (ir->data.mode == ir_var_uniform) {
 
       if (ir->type->is_sampler()) {
 
+         unsigned int type_pointer_id = visit_type_pointer(ir->type, ir->data.mode, type_id);
          unsigned int name_id = unique_name(ir);
+
+         f->types.push(SpvOpVariable | (4 << SpvWordCountShift));
+         f->types.push(type_pointer_id);
+         f->types.push(name_id);
+         f->types.push(SpvStorageClassUniformConstant);
 
          f->decorates.push(SpvOpDecorate | (4 << SpvWordCountShift));
          f->decorates.push(name_id);
@@ -708,7 +734,7 @@ void ir_print_spirv_visitor::visit(ir_variable *ir)
 
          ir->ir_uniform = f->uniforms.count();
 
-         f->uniforms.push(vector_id);
+         f->uniforms.push(type_id);
          
          f->binding_start_id = (f->binding_start_id == -1) ? f->binding_id++ : f->binding_start_id;
          f->reflections.push(GL_UNIFORM);
@@ -728,7 +754,7 @@ void ir_print_spirv_visitor::visit(ir_variable *ir)
 
    } else {
 
-      unsigned int pointer_id = visit_type_pointer(ir->type, ir->data.mode, vector_id);
+      unsigned int pointer_id = visit_type_pointer(ir->type, ir->data.mode, type_id);
       unsigned int name_id = unique_name(ir);
 
       if (ir->data.mode == ir_var_auto || ir->data.mode == ir_var_temporary) {
@@ -754,12 +780,13 @@ void ir_print_spirv_visitor::visit(ir_variable *ir)
 
          f->reflections.push(ir->data.mode == ir_var_shader_in ? GL_PROGRAM_INPUT : GL_PROGRAM_OUTPUT);
          f->reflections.push(ir->name);
-         if (ir->type->is_float() || (ir->type->is_array() && ir->type->fields.array->is_float())) {
-            f->reflections.push(reflection_float_type[ir->type->vector_elements - 1][ir->type->matrix_columns - 1]);
+         const glsl_type* base_type = ir->type->is_array() ? ir->type->fields.array : ir->type;
+         if (ir->type->is_float()) {
+            f->reflections.push(reflection_float_type[base_type->vector_elements - 1][base_type->matrix_columns - 1]);
          } else {
-            f->reflections.push(reflection_int_type[ir->type->vector_elements - 1]);
+            f->reflections.push(reflection_int_type[base_type->vector_elements - 1]);
          }
-         unsigned int current_size = (ir->type->vector_elements * 4) * ir->type->matrix_columns;
+         unsigned int current_size = ir->type->std430_size(false);
          f->reflections.push(0u);
          f->reflections.push(current_size);
          f->reflections.push((ir->data.mode == ir_var_shader_in) ? (f->input_loc - 1) : (f->output_loc - 1));
@@ -791,7 +818,7 @@ void ir_print_spirv_visitor::visit(ir_function_signature *ir)
    // TypeName
    unsigned int function_name_id = 0;
    if (stricmp(ir->function_name(), "main") == 0) {
-      function_name_id = f->main_id;
+      function_name_id = f->main_id = f->id++;
    } else {
       function_name_id = f->id++;
    }
@@ -1174,43 +1201,11 @@ void ir_print_spirv_visitor::visit(ir_dereference_variable *ir)
 
    switch (var->data.mode) {
    case ir_var_uniform:
-      if (var->type->is_sampler()) {
-
-         if (var->ir_initialized == 0) {
-            unsigned int type_id = visit_type(var->type);
-            unsigned int type_pointer_id = visit_type_pointer(var->type, var->data.mode, type_id);
-
-            f->types.push(SpvOpVariable | (4 << SpvWordCountShift));
-            f->types.push(type_pointer_id);
-            f->types.push(var->ir_pointer);
-            f->types.push(SpvStorageClassUniformConstant);
-
-            var->ir_initialized = var->ir_pointer;
-         }
-
-         ir->ir_pointer = var->ir_initialized;
-      } else {
-
-         if (var->ir_initialized == 0) {
-            ir_constant ir_uniform(var->ir_uniform);
-            ir_uniform.ir_value = 0;
-            visit(&ir_uniform);
-
-            unsigned int uniform_type = visit_type(var->type);
-            unsigned int type_pointer_id = visit_type_pointer(var->type, var->data.mode, uniform_type);
-            unsigned int access_id = f->id++;
-
-            f->functions.push(SpvOpAccessChain | (5 << SpvWordCountShift));
-            f->functions.push(type_pointer_id);
-            f->functions.push(access_id);
-            f->functions.push(f->uniform_id);
-            f->functions.push(ir_uniform.ir_value);
-
-            var->ir_initialized = access_id;
-         }
-
-         ir->ir_pointer = var->ir_initialized;
+      if (var->type->is_sampler() == false) {
+         ir->ir_uniform = var->ir_uniform + 1;
+         break;
       }
+      ir->ir_pointer = var->ir_pointer;
       break;
    case ir_var_shader_out:
       if (f->shader_stage != MESA_SHADER_FRAGMENT && is_gl_identifier(var->name)) {
@@ -1228,19 +1223,20 @@ void ir_print_spirv_visitor::visit(ir_dereference_variable *ir)
             f->decorates.push(SpvDecorationBlock);
          }
 
-         const glsl_type* type;
-         SpvBuiltIn built_in;
-         if (strcmp(var->name, "gl_Position") == 0) {
-            type = glsl_type::vec4_type;
-            built_in = SpvBuiltInPosition;
-         } else if (strcmp(var->name, "gl_PointSize") == 0) {
-            type = glsl_type::float_type;
-            built_in = SpvBuiltInPointSize;
-         } else {
-            break;
-         }
-
          if (var->ir_initialized == 0) {
+
+            const glsl_type* type;
+            SpvBuiltIn built_in;
+            if (strcmp(var->name, "gl_Position") == 0) {
+               type = glsl_type::vec4_type;
+               built_in = SpvBuiltInPosition;
+            } else if (strcmp(var->name, "gl_PointSize") == 0) {
+               type = glsl_type::float_type;
+               built_in = SpvBuiltInPointSize;
+            } else {
+               break;
+            }
+
             unsigned int len = (int)strlen(var->name);
             unsigned int count = (len + sizeof(int)) / sizeof(int);
             f->names.push(SpvOpMemberName | ((count + 3) << SpvWordCountShift));
@@ -1309,11 +1305,24 @@ void ir_print_spirv_visitor::visit(ir_dereference_array *ir)
    unsigned int type_id = visit_type(ir->type);
    unsigned int type_id_pointer = visit_type_pointer(ir->type, ir_var_auto, type_id);
    unsigned int return_id = f->id++;
-   f->functions.push(SpvOpAccessChain | (5 << SpvWordCountShift));
-   f->functions.push(type_id_pointer);
-   f->functions.push(return_id);
-   f->functions.push(ir->array->ir_pointer);
-   f->functions.push(ir->array_index->ir_value);
+   if (ir->array->ir_uniform) {
+      ir_constant ir_uniform(ir->array->ir_uniform - 1);
+      ir_uniform.ir_value = 0;
+      visit(&ir_uniform);
+
+      f->functions.push(SpvOpAccessChain | (6 << SpvWordCountShift));
+      f->functions.push(type_id_pointer);
+      f->functions.push(return_id);
+      f->functions.push(f->uniform_id);
+      f->functions.push(ir_uniform.ir_value);
+      f->functions.push(ir->array_index->ir_value);
+   } else {
+      f->functions.push(SpvOpAccessChain | (5 << SpvWordCountShift));
+      f->functions.push(type_id_pointer);
+      f->functions.push(return_id);
+      f->functions.push(ir->array->ir_pointer);
+      f->functions.push(ir->array_index->ir_value);
+   }
 
    ir->ir_pointer = return_id;
 }
