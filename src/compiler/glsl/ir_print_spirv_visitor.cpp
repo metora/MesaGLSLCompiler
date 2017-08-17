@@ -842,8 +842,17 @@ void ir_print_spirv_visitor::visit(ir_function_signature *ir)
       inst->accept(this);
    }
 
+   // Variable
    foreach_in_list(ir_instruction, inst, &ir->body) {
-      inst->accept(this);
+      if (inst->as_variable()) {
+         inst->accept(this);
+      }
+   }
+
+   foreach_in_list(ir_instruction, inst, &ir->body) {
+      if (inst->as_variable() == NULL) {
+         inst->accept(this);
+      }
    }
 
    // Return
