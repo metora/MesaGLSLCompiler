@@ -1303,13 +1303,13 @@ void ir_print_spirv_visitor::visit(ir_dereference_array *ir)
    visit_value(ir->array_index);
 
    unsigned int type_id = visit_type(ir->type);
-   unsigned int type_id_pointer = visit_type_pointer(ir->type, ir_var_auto, type_id);
    unsigned int return_id = f->id++;
    if (ir->array->ir_uniform) {
       ir_constant ir_uniform(ir->array->ir_uniform - 1);
       ir_uniform.ir_value = 0;
       visit(&ir_uniform);
 
+      unsigned int type_id_pointer = visit_type_pointer(ir->type, ir_var_uniform, type_id);
       f->functions.push(SpvOpAccessChain | (6 << SpvWordCountShift));
       f->functions.push(type_id_pointer);
       f->functions.push(return_id);
@@ -1317,6 +1317,7 @@ void ir_print_spirv_visitor::visit(ir_dereference_array *ir)
       f->functions.push(ir_uniform.ir_value);
       f->functions.push(ir->array_index->ir_value);
    } else {
+      unsigned int type_id_pointer = visit_type_pointer(ir->type, ir_var_auto, type_id);
       f->functions.push(SpvOpAccessChain | (5 << SpvWordCountShift));
       f->functions.push(type_id_pointer);
       f->functions.push(return_id);
