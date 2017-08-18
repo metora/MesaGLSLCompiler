@@ -46,6 +46,11 @@ struct gl_shader_program * standalone_compile_shader(
       const struct standalone_options *options,
       unsigned num_files, char* const* files);
 
+unsigned int standalone_generate_spirv(
+      const struct standalone_options *options,
+      unsigned shader_type, const char* source,
+      unsigned buffer_len, char* buffer);
+
 void standalone_compiler_cleanup(struct gl_shader_program *prog);
 
 #ifdef __cplusplus

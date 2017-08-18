@@ -208,6 +208,12 @@ initialize_context(struct gl_context *ctx, gl_api api)
       ctx->Const.MaxLights = 8;
       ctx->Const.MaxTextureCoordUnits = 8;
       ctx->Const.MaxTextureUnits = 2;
+      ctx->Const.MaxVertexStreams = 8;
+      ctx->Const.MaxTransformFeedbackBuffers = 8;
+      ctx->Const.MaxCombinedUniformBlocks = 8;
+      ctx->Const.MaxUniformBufferBindings = 8;
+      ctx->Const.MaxUniformBlockSize = 4096;
+      ctx->Const.UniformBufferOffsetAlignment = 64;
 
       ctx->Const.Program[MESA_SHADER_VERTEX].MaxAttribs = 16;
       ctx->Const.Program[MESA_SHADER_VERTEX].MaxTextureImageUnits = 16;
@@ -577,6 +583,229 @@ fail:
 
    ralloc_free(whole_program);
    return NULL;
+}
+
+extern "C" unsigned int
+standalone_generate_spirv(const struct standalone_options *_options,
+    unsigned shader_type, const char* source,
+    unsigned buffer_len, char* out_buffer)
+{
+   int status = EXIT_SUCCESS;
+   static struct gl_context local_ctx;
+   struct gl_context *ctx = &local_ctx;
+   bool glsl_es = false;
+
+   options = _options;
+
+   switch (options->glsl_version) {
+   case 100:
+   case 300:
+      glsl_es = true;
+      break;
+   case 110:
+   case 120:
+   case 130:
+   case 140:
+   case 150:
+   case 330:
+   case 400:
+   case 410:
+   case 420:
+   case 430:
+   case 440:
+   case 450:
+      glsl_es = false;
+      break;
+   default:
+      fprintf(stderr, "Unrecognized GLSL version `%d'\n", options->glsl_version);
+      return NULL;
+   }
+
+   if (glsl_es) {
+      initialize_context(ctx, API_OPENGLES2);
+   } else {
+      initialize_context(ctx, options->glsl_version > 130 ? API_OPENGL_CORE : API_OPENGL_COMPAT);
+   }
+
+   struct gl_shader_program *whole_program;
+
+   whole_program = rzalloc (NULL, struct gl_shader_program);
+   assert(whole_program != NULL);
+   whole_program->data = rzalloc(whole_program, struct gl_shader_program_data);
+   assert(whole_program->data != NULL);
+   whole_program->data->InfoLog = ralloc_strdup(whole_program->data, "");
+   whole_program->IsES = glsl_es;
+
+   /* Created just to avoid segmentation faults */
+   whole_program->AttributeBindings = new string_to_uint_map;
+   whole_program->FragDataBindings = new string_to_uint_map;
+   whole_program->FragDataIndexBindings = new string_to_uint_map;
+
+   whole_program->Shaders =
+         reralloc(whole_program, whole_program->Shaders,
+               struct gl_shader *, whole_program->NumShaders + 1);
+   assert(whole_program->Shaders != NULL);
+
+   struct gl_shader *shader = rzalloc(whole_program, gl_shader);
+
+   whole_program->Shaders[whole_program->NumShaders] = shader;
+   whole_program->NumShaders++;
+
+   switch (shader_type) {
+   case GL_VERTEX_SHADER:
+   case GL_TESS_CONTROL_SHADER:
+   case GL_TESS_EVALUATION_SHADER:
+   case GL_GEOMETRY_SHADER:
+   case GL_FRAGMENT_SHADER:
+   case GL_COMPUTE_SHADER:
+      shader->Type = shader_type;
+      break;
+   default:
+      goto fail;
+   }
+
+   shader->Stage = _mesa_shader_enum_to_shader_stage(shader->Type);
+
+   shader->Source = source;
+   if (shader->Source == NULL) {
+      printf("Source Code does not exist.\n");
+      exit(EXIT_FAILURE);
+   }
+
+   compile_shader(ctx, shader);
+
+   if (strlen(shader->InfoLog) > 0) {
+      if (!options->just_log)
+         printf("Info log for :\n");
+
+      printf("%s", shader->InfoLog);
+      if (!options->just_log)
+         printf("\n");
+   }
+
+   gl_shader_stage stage = MESA_SHADER_VERTEX;
+   if (!shader->CompileStatus) {
+      status = EXIT_FAILURE;
+   }
+
+   size_t bin_size = -1;
+   if (status == EXIT_SUCCESS) {
+      _mesa_clear_shader_program_data(ctx, whole_program);
+
+      if (options->do_link)  {
+         link_shaders(ctx, whole_program);
+      } else {
+         stage = whole_program->Shaders[0]->Stage;
+
+         whole_program->data->LinkStatus = linking_success;
+         whole_program->_LinkedShaders[stage] =
+            link_intrastage_shaders(whole_program /* mem_ctx */,
+                                    ctx,
+                                    whole_program,
+                                    whole_program->Shaders,
+                                    1,
+                                    true);
+
+         /* Par-linking can fail, for example, if there are undefined external
+          * references.
+          */
+         if (whole_program->_LinkedShaders[stage] != NULL) {
+            assert(whole_program->data->LinkStatus);
+
+            struct gl_shader_compiler_options *const compiler_options =
+               &ctx->Const.ShaderCompilerOptions[stage];
+
+            exec_list *const ir =
+               whole_program->_LinkedShaders[stage]->ir;
+
+            bool progress;
+            do {
+               progress = do_function_inlining(ir);
+
+               progress = do_common_optimization(ir,
+                                                 true,
+                                                 false,
+                                                 compiler_options,
+                                                 true)
+                  && progress;
+            } while(progress);
+         }
+      }
+
+      status = (whole_program->data->LinkStatus) ? EXIT_SUCCESS : EXIT_FAILURE;
+
+      if (strlen(whole_program->data->InfoLog) > 0) {
+         printf("\n");
+         if (!options->just_log)
+            printf("Info log for linking:\n");
+         printf("%s", whole_program->data->InfoLog);
+         if (!options->just_log)
+            printf("\n");
+      }
+
+      struct gl_linked_shader *shader = whole_program->_LinkedShaders[stage];
+
+      if (!shader)
+         goto fail;
+
+      add_neg_to_sub_visitor av;
+      visit_list_elements(&av, shader->ir);
+
+      mul_add_to_fma_visitor mv;
+      visit_list_elements(&mv, shader->ir);
+
+      do_dead_variables(shader->ir);
+
+      if (options->dump_lir) {
+
+         if (!shader)
+             goto fail;
+         
+         _mesa_print_ir(stdout, shader->ir, NULL);
+         
+      }
+
+      if (!shader)
+         goto fail;
+
+      spirv_buffer buffer;
+      _mesa_print_spirv(&buffer, shader->ir, stage, whole_program->Shaders[0]->Version, whole_program->IsES, 0, 0);
+
+      std::vector<unsigned int> spirv_data(buffer.data(), buffer.data() + buffer.count());
+      if (options->dump_spirv) {
+         spv::Disassemble(std::cout, spirv_data);
+      }
+
+      if (options->dump_spirv_glsl) {
+
+         // Read SPIR-V from.
+         spirv_cross::CompilerGLSL glsl(spirv_data);
+
+         // Set some options.
+         spirv_cross::CompilerGLSL::Options options;
+         options.version = whole_program->Shaders[0]->Version;
+         options.es = whole_program->IsES;
+         glsl.set_options(options);
+
+         // Compile to GLSL, ready to give to GL driver.
+         std::string source = glsl.compile();
+         std::cout << source;
+      }
+
+      bin_size = (spirv_data.size() > buffer_len) ? buffer_len : spirv_data.size() * sizeof(unsigned int);
+      memcpy(out_buffer, spirv_data.data(), bin_size);
+   }
+
+   return bin_size;
+
+fail:
+   for (unsigned i = 0; i < MESA_SHADER_STAGES; i++) {
+      if (whole_program->_LinkedShaders[i])
+         ralloc_free(whole_program->_LinkedShaders[i]->Program);
+   }
+
+   ralloc_free(whole_program);
+   return -1;
 }
 
 extern "C" void

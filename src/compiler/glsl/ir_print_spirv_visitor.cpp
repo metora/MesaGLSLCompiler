@@ -1205,7 +1205,7 @@ void ir_print_spirv_visitor::visit(ir_swizzle *ir)
 void ir_print_spirv_visitor::visit(ir_dereference_variable *ir)
 {
    ir_variable *var = ir->variable_referenced();
-   if (var->data.mode != ir_var_uniform)
+   if ((f->shader_stage != MESA_SHADER_VERTEX || strcmp (var->name, "gl_Position") != 0) && var->data.mode != ir_var_uniform)
       unique_name(var);
 
    switch (var->data.mode) {
