@@ -1,0 +1,266 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{45d41acc-2c3c-43d2-bc10-02aa73ffc7c7}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ast_array_index.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ast_expr.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ast_function.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ast_to_hir.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ast_type.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\builtin_functions.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\builtin_types.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\builtin_variables.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\generate_ir.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\glcpp\glcpp-lex.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\glcpp\glcpp-parse.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\glcpp\pp.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\glsl_lexer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\glsl_parser.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\glsl_parser_extras.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\glsl_symbol_table.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\hir_field_selection.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_array_refcount.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_basic_block.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_builder.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_builder_print_visitor.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_clone.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_constant_expression.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_equals.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_expression_flattening.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_function.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_function_can_inline.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_function_detect_recursion.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_hierarchical_visitor.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_hv_accept.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_print_spirv_visitor.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_print_visitor.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_reader.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_rvalue_visitor.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_set_program_inouts.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_validate.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_variable_refcount.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\linker.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\link_atomics.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\link_functions.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\link_interface_blocks.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\link_uniforms.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\link_uniform_blocks.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\link_uniform_block_active_visitor.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\link_uniform_initializers.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\link_varyings.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\loop_analysis.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\loop_controls.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\loop_unroll.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_blend_equation_advanced.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_buffer_access.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_const_arrays_to_uniforms.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_discard.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_discard_flow.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_distance.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_if_to_cond_assign.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_instructions.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_int64.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_jumps.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_mat_op_to_vec.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_named_interface_blocks.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_noise.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_offset_array.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_output_reads.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_packed_varyings.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_packing_builtins.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_shared_reference.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_subroutine.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_tess_level.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_texture_projection.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_ubo_reference.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_variable_index_to_cond_assign.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_vector.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_vector_derefs.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_vector_insert.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_vec_index_to_cond_assign.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_vec_index_to_swizzle.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_vertex_id.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_algebraic.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_array_splitting.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_conditional_discard.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_constant_folding.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_constant_propagation.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_constant_variable.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_copy_propagation.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_copy_propagation_elements.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_dead_builtin_variables.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_dead_builtin_varyings.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_dead_code.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_dead_code_local.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_dead_functions.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_dead_variable.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_flatten_nested_if_blocks.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_flip_matrices.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_function_inlining.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_if_simplification.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_minmax.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_noop_swizzle.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_rebalance_tree.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_redundant_jumps.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_structure_splitting.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_swizzle_swizzle.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_tree_grafting.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_vectorize.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\propagate_invariance.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\standalone.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\standalone_scaffolding.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\s_expression.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl_types.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\shader_enums.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\disassemble.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\doc.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\spirv_cfg.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\spirv_cpp.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\spirv_cross.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\spirv_glsl.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\getopt\getopt_long.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\extensions_table.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\imports.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\mesa\program\symbol_table.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\util\half_float.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\util\hash_table.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\util\ralloc.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\util\set.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\util\strtod.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\src\util\u_vector.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\c11\threads.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\c11\threads_posix.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\c11\threads_win32.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\c99_alloca.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\c99_compat.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\c99_math.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\include\no_extern_c.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\builtin_type_macros.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ast.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\glcpp\glcpp-parse.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\glcpp\glcpp.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\glsl_parser.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\glsl_parser_extras.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\glsl_symbol_table.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_array_refcount.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_basic_block.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_builder.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_builder_print_visitor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_expression_flattening.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_expression_operation.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_expression_operation_constant.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_expression_operation_strings.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_function_inlining.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_hierarchical_visitor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_optimization.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_print_spirv_visitor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_print_visitor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_reader.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_rvalue_visitor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_uniform.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_variable_refcount.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\ir_visitor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\linker.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\link_uniform_block_active_visitor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\link_varyings.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\list.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\loop_analysis.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\lower_buffer_access.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\opt_mul_add_to_fma.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\program.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\standalone.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\standalone_scaffolding.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl\s_expression.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\glsl_types.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\shader_enums.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\disassemble.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\doc.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\GLSL.ext.AMD.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\GLSL.ext.KHR.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\GLSL.ext.NV.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\GLSL.std.450.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\spirv.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\spirv.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\spirv_cfg.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\spirv_common.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\spirv_cpp.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\spirv_cross.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\compiler\spirv\spirv_glsl.hpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\gallium\auxiliary\util\u_math.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\getopt\getopt.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\compiler.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\config.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\context.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\core.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\dd.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\debug_output.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\enums.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\errors.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\extensions.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\extensions_table.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\formats.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\glheader.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\imports.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\macros.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\mtypes.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\main\shaderobj.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\program\prog_instruction.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\program\prog_parameter.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\program\prog_statevars.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\mesa\program\symbol_table.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\util\bitscan.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\util\half_float.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\util\hash_table.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\util\list.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\util\macros.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\util\ralloc.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\util\rounding.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\util\set.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\util\string_to_uint_map.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\util\strndup.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\util\strtod.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\util\u_atomic.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\util\u_endian.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\..\src\util\u_vector.h" />
+  </ItemGroup>
+</Project>
