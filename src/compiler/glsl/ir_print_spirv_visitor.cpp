@@ -411,7 +411,7 @@ unsigned int ir_print_spirv_visitor::visit_type(const struct glsl_type *type)
       f->decorates.push(SpvOpDecorate | (4 << SpvWordCountShift));
       f->decorates.push(vector_id);
       f->decorates.push(SpvDecorationArrayStride);
-      f->decorates.push(type->std430_array_stride(false));
+      f->decorates.push(type->fields.array->std430_array_stride(false));
 
       return vector_id;
    } else if (type->is_boolean()) {
@@ -987,6 +987,24 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
          case ir_unop_sin:       f->functions.push(GLSLstd450Sin);         break;
          case ir_unop_cos:       f->functions.push(GLSLstd450Cos);         break;
          }
+         break;
+      case ir_unop_f2i:
+      case ir_unop_f2u:
+      case ir_unop_i2f:
+      case ir_unop_u2f:
+      case ir_unop_i2u:
+      case ir_unop_u2i:
+         switch (ir->operation) {
+         default:
+         case ir_unop_f2i:   f->functions.push(SpvOpConvertFToS | (4 << SpvWordCountShift)); break;
+         case ir_unop_f2u:   f->functions.push(SpvOpConvertFToU | (4 << SpvWordCountShift)); break;
+         case ir_unop_i2f:   f->functions.push(SpvOpConvertSToF | (4 << SpvWordCountShift)); break;
+         case ir_unop_u2f:   f->functions.push(SpvOpConvertUToF | (4 << SpvWordCountShift)); break;
+         case ir_unop_i2u:   f->functions.push(SpvOpUConvert | (4 << SpvWordCountShift));    break;
+         case ir_unop_u2i:   f->functions.push(SpvOpSConvert | (4 << SpvWordCountShift));    break;
+         }
+         f->functions.push(type_id);
+         f->functions.push(value_id);
          break;
       }
       f->functions.push(ir->operands[0]->ir_value);
