@@ -408,6 +408,11 @@ unsigned int ir_print_spirv_visitor::visit_type(const struct glsl_type *type)
       f->types.push(base_type_id);
       f->types.push(ir_array_size.ir_value);
 
+      f->decorates.push(SpvOpDecorate | (4 << SpvWordCountShift));
+      f->decorates.push(vector_id);
+      f->decorates.push(SpvDecorationArrayStride);
+      f->decorates.push(type->std430_array_stride(false));
+
       return vector_id;
    } else if (type->is_boolean()) {
       if (f->bool_id == 0) {
@@ -585,6 +590,27 @@ void ir_print_spirv_visitor::visit_value(ir_rvalue *ir)
       if (ir->ir_pointer != 0) {
          unsigned int type_id = visit_type(ir->type);
          unsigned int value_id = f->id++;
+#if 0
+         if (ir->ir_initialized != 0) {
+            if (ir->type->is_integer()) {
+               ir_constant ir_const(0, ir->type->components());
+               ir_const.ir_value = 0;
+               visit(&ir_const);
+
+               f->functions.push(SpvOpStore | (3 << SpvWordCountShift));
+               f->functions.push(ir->ir_pointer);
+               f->functions.push(ir_const.ir_value);
+            } else if (ir->type->is_float()) {
+               ir_constant ir_const(0.0f, ir->type->components());
+               ir_const.ir_value = 0;
+               visit(&ir_const);
+
+               f->functions.push(SpvOpStore | (3 << SpvWordCountShift));
+               f->functions.push(ir->ir_pointer);
+               f->functions.push(ir_const.ir_value);
+            }
+         }
+#endif
          f->functions.push(SpvOpLoad | (4 << SpvWordCountShift));
          f->functions.push(type_id);
          f->functions.push(value_id);
@@ -974,7 +1000,6 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
       default:
       case ir_binop_add:
       case ir_binop_sub:
-      case ir_binop_mul:
       case ir_binop_div:
       case ir_binop_mod:
       case ir_binop_less:
@@ -988,7 +1013,6 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
          default:
          case ir_binop_add:         f->functions.push(SpvOpFAdd | (5 << SpvWordCountShift));                    break;
          case ir_binop_sub:         f->functions.push(SpvOpFSub | (5 << SpvWordCountShift));                    break;
-         case ir_binop_mul:         f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));                    break;
          case ir_binop_div:         f->functions.push(SpvOpFDiv | (5 << SpvWordCountShift));                    break;
          case ir_binop_mod:         f->functions.push(SpvOpFMod | (5 << SpvWordCountShift));                    break;
          case ir_binop_less:        f->functions.push(SpvOpFOrdLessThan | (5 << SpvWordCountShift));            break;
@@ -1002,6 +1026,44 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
          f->functions.push(type_id);
          f->functions.push(value_id);
          break;
+      case ir_binop_mul: {
+         if (ir->operands[0]->type->is_scalar()) {
+            if (ir->operands[1]->type->is_scalar()) {
+               f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));
+            } else if (ir->operands[1]->type->is_vector()) {
+               f->functions.push(SpvOpVectorTimesScalar | (5 << SpvWordCountShift));
+            } else if (ir->operands[1]->type->is_matrix()) {
+               f->functions.push(SpvOpMatrixTimesScalar | (5 << SpvWordCountShift));
+            } else {
+               f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));
+            }
+         } else if (ir->operands[0]->type->is_vector()) {
+            if (ir->operands[1]->type->is_scalar()) {
+               f->functions.push(SpvOpVectorTimesScalar | (5 << SpvWordCountShift));
+            } else if (ir->operands[1]->type->is_vector()) {
+               f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));
+            } else if (ir->operands[1]->type->is_matrix()) {
+               f->functions.push(SpvOpVectorTimesMatrix | (5 << SpvWordCountShift));
+            } else {
+               f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));
+            }
+         } else if (ir->operands[0]->type->is_matrix()) {
+            if (ir->operands[1]->type->is_scalar()) {
+               f->functions.push(SpvOpMatrixTimesScalar | (5 << SpvWordCountShift));
+            } else if (ir->operands[1]->type->is_vector()) {
+               f->functions.push(SpvOpMatrixTimesVector | (5 << SpvWordCountShift));
+            } else if (ir->operands[1]->type->is_matrix()) {
+               f->functions.push(SpvOpMatrixTimesMatrix | (5 << SpvWordCountShift));
+            } else {
+               f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));
+            }
+         } else {
+            f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));
+         }
+         f->functions.push(type_id);
+         f->functions.push(value_id);
+         break;
+      }
       case ir_binop_min:
       case ir_binop_max:
       case ir_binop_pow:
@@ -1207,6 +1269,16 @@ void ir_print_spirv_visitor::visit(ir_dereference_variable *ir)
       unique_name(var);
 
    switch (var->data.mode) {
+#if 0
+   case ir_var_auto:
+   case ir_var_temporary:
+      if (var->ir_initialized == 0) {
+         var->ir_initialized = UINT_MAX;
+         ir->ir_initialized = UINT_MAX;
+      }
+      ir->ir_pointer = var->ir_pointer;
+      break;
+#endif
    case ir_var_uniform:
       if (var->type->is_sampler() == false) {
          ir->ir_uniform = var->ir_uniform + 1;
