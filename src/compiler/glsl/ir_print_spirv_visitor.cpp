@@ -895,11 +895,14 @@ void ir_print_spirv_visitor::visit(ir_function *ir)
 
 void ir_print_spirv_visitor::visit(ir_expression *ir)
 {
+   unsigned int operands[4] = {};
+
    for (unsigned int i = 0; i < ir->get_num_operands(); ++i) {
       if (ir->operands[i] == NULL)
          return;
       ir->operands[i]->accept(this);
       visit_value(ir->operands[i]);
+      operands[i] = ir->operands[i]->ir_value;
    }
 
    unsigned int type_id = visit_type(ir->type);
@@ -921,9 +924,56 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
       f->functions.push(value_id);
       f->functions.push(f->import_id);
       f->functions.push(GLSLstd450FClamp);
-      f->functions.push(ir->operands[0]->ir_value);
+      f->functions.push(operands[0]);
       f->functions.push(zero_ir.ir_value);
       f->functions.push(one_ir.ir_value);
+      ir->ir_value = value_id;
+   } else if (ir->operation == ir_binop_mul) {
+      if (ir->get_num_operands() != 2)
+         return;
+
+      unsigned int value_id = f->id++;
+      if (ir->operands[0]->type->is_scalar()) {
+         if (ir->operands[1]->type->is_scalar()) {
+            f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));
+         } else if (ir->operands[1]->type->is_vector()) {
+            f->functions.push(SpvOpVectorTimesScalar | (5 << SpvWordCountShift));
+            operands[0] = ir->operands[1]->ir_value;
+            operands[1] = ir->operands[0]->ir_value;
+         } else if (ir->operands[1]->type->is_matrix()) {
+            f->functions.push(SpvOpMatrixTimesScalar | (5 << SpvWordCountShift));
+            operands[0] = ir->operands[1]->ir_value;
+            operands[1] = ir->operands[0]->ir_value;
+         } else {
+            unreachable("unknown multiply operation");
+         }
+      } else if (ir->operands[0]->type->is_vector()) {
+         if (ir->operands[1]->type->is_scalar()) {
+            f->functions.push(SpvOpVectorTimesScalar | (5 << SpvWordCountShift));
+         } else if (ir->operands[1]->type->is_vector()) {
+            f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));
+         } else if (ir->operands[1]->type->is_matrix()) {
+            f->functions.push(SpvOpVectorTimesMatrix | (5 << SpvWordCountShift));
+         } else {
+            unreachable("unknown multiply operation");
+         }
+      } else if (ir->operands[0]->type->is_matrix()) {
+         if (ir->operands[1]->type->is_scalar()) {
+            f->functions.push(SpvOpMatrixTimesScalar | (5 << SpvWordCountShift));
+         } else if (ir->operands[1]->type->is_vector()) {
+            f->functions.push(SpvOpMatrixTimesVector | (5 << SpvWordCountShift));
+         } else if (ir->operands[1]->type->is_matrix()) {
+            f->functions.push(SpvOpMatrixTimesMatrix | (5 << SpvWordCountShift));
+         } else {
+            unreachable("unknown multiply operation");
+         }
+      } else {
+         unreachable("unknown multiply operation");
+      }
+      f->functions.push(type_id);
+      f->functions.push(value_id);
+      f->functions.push(operands[0]);
+      f->functions.push(operands[1]);
       ir->ir_value = value_id;
    } else if (ir->operation >= ir_unop_bit_not && ir->operation <= ir_unop_vote_eq) {
       if (ir->get_num_operands() != 1)
@@ -932,6 +982,7 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
       unsigned int value_id = f->id++;
       switch (ir->operation) {
       default:
+         unreachable("unknown operation");
       case ir_unop_neg:
          f->functions.push(SpvOpFNegate | (4 << SpvWordCountShift));
          f->functions.push(type_id);
@@ -1007,7 +1058,7 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
          f->functions.push(value_id);
          break;
       }
-      f->functions.push(ir->operands[0]->ir_value);
+      f->functions.push(operands[0]);
       ir->ir_value = value_id;
    } else if (ir->operation >= ir_binop_add && ir->operation <= ir_binop_interpolate_at_sample) {
       if (ir->get_num_operands() != 2)
@@ -1016,6 +1067,7 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
       unsigned int value_id = f->id++;
       switch (ir->operation) {
       default:
+         unreachable("unknown operation");
       case ir_binop_add:
       case ir_binop_sub:
       case ir_binop_div:
@@ -1044,44 +1096,6 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
          f->functions.push(type_id);
          f->functions.push(value_id);
          break;
-      case ir_binop_mul: {
-         if (ir->operands[0]->type->is_scalar()) {
-            if (ir->operands[1]->type->is_scalar()) {
-               f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));
-            } else if (ir->operands[1]->type->is_vector()) {
-               f->functions.push(SpvOpVectorTimesScalar | (5 << SpvWordCountShift));
-            } else if (ir->operands[1]->type->is_matrix()) {
-               f->functions.push(SpvOpMatrixTimesScalar | (5 << SpvWordCountShift));
-            } else {
-               f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));
-            }
-         } else if (ir->operands[0]->type->is_vector()) {
-            if (ir->operands[1]->type->is_scalar()) {
-               f->functions.push(SpvOpVectorTimesScalar | (5 << SpvWordCountShift));
-            } else if (ir->operands[1]->type->is_vector()) {
-               f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));
-            } else if (ir->operands[1]->type->is_matrix()) {
-               f->functions.push(SpvOpVectorTimesMatrix | (5 << SpvWordCountShift));
-            } else {
-               f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));
-            }
-         } else if (ir->operands[0]->type->is_matrix()) {
-            if (ir->operands[1]->type->is_scalar()) {
-               f->functions.push(SpvOpMatrixTimesScalar | (5 << SpvWordCountShift));
-            } else if (ir->operands[1]->type->is_vector()) {
-               f->functions.push(SpvOpMatrixTimesVector | (5 << SpvWordCountShift));
-            } else if (ir->operands[1]->type->is_matrix()) {
-               f->functions.push(SpvOpMatrixTimesMatrix | (5 << SpvWordCountShift));
-            } else {
-               f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));
-            }
-         } else {
-            f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));
-         }
-         f->functions.push(type_id);
-         f->functions.push(value_id);
-         break;
-      }
       case ir_binop_min:
       case ir_binop_max:
       case ir_binop_pow:
@@ -1099,16 +1113,33 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
          }
          break;
       }
-      f->functions.push(ir->operands[0]->ir_value);
-      f->functions.push(ir->operands[1]->ir_value);
+      f->functions.push(operands[0]);
+      f->functions.push(operands[1]);
       ir->ir_value = value_id;
    } else if (ir->operation >= ir_triop_fma && ir->operation <= ir_triop_vector_insert) {
       if (ir->get_num_operands() != 3)
          return;
 
+      for (unsigned int i = 0; i < 3; ++i) {
+         if (ir->operands[i]->type == ir->type) {
+            operands[i] = ir->operands[i]->ir_value;
+         } else if (ir->operands[i]->type->components() == 1) {
+            operands[i] = f->id++;
+            f->functions.push(SpvOpCompositeConstruct | ((3 + ir->type->components()) << SpvWordCountShift));
+            f->functions.push(type_id);
+            f->functions.push(operands[i]);
+            for (unsigned int j = 0; j < ir->type->components(); ++j) {
+               f->functions.push(ir->operands[i]->ir_value);
+            }
+         } else {
+            unreachable("operands must match result or be scalar");
+         }
+      }
+
       unsigned int value_id = f->id++;
       switch (ir->operation) {
       default:
+         unreachable("unknown operation");
       case ir_triop_fma:
       case ir_triop_lrp:
          f->functions.push(SpvOpExtInst | (8 << SpvWordCountShift));
@@ -1122,9 +1153,9 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
          }
          break;
       }
-      f->functions.push(ir->operands[0]->ir_value);
-      f->functions.push(ir->operands[1]->ir_value);
-      f->functions.push(ir->operands[2]->ir_value);
+      f->functions.push(operands[0]);
+      f->functions.push(operands[1]);
+      f->functions.push(operands[2]);
       ir->ir_value = value_id;
    }
 
