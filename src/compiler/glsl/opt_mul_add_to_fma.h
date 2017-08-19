@@ -41,6 +41,12 @@ public:
 
       ir_expression const *op0 = ir->operands[0]->as_expression();
       if (op0 != NULL && op0->operation == ir_binop_mul) {
+         if (op0->operands[0]->type->is_matrix() || op0->operands[0]->type->is_array()) {
+            return visit_continue;
+         }
+         if (op0->operands[1]->type->is_matrix() || op0->operands[1]->type->is_array()) {
+            return visit_continue;
+         }
          ir->operation = ir_triop_fma;
          ir->operands[2] = ir->operands[1];
          ir->operands[1] = op0->operands[1];
@@ -50,6 +56,12 @@ public:
 
       ir_expression const *op1 = ir->operands[1]->as_expression();
       if (op1 != NULL && op1->operation == ir_binop_mul) {
+         if (op1->operands[0]->type->is_matrix() || op1->operands[0]->type->is_array()) {
+            return visit_continue;
+         }
+         if (op1->operands[1]->type->is_matrix() || op1->operands[1]->type->is_array()) {
+            return visit_continue;
+         }
          ir->operation = ir_triop_fma;
          ir->operands[2] = ir->operands[0];
          ir->operands[1] = op1->operands[1];
