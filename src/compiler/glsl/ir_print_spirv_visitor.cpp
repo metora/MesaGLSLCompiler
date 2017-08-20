@@ -906,6 +906,27 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
    }
 
    unsigned int type_id = visit_type(ir->type);
+   bool float_type;
+   bool signed_type;
+   switch (ir->type->base_type)
+   {
+   default:
+   case GLSL_TYPE_FLOAT:
+   case GLSL_TYPE_DOUBLE:
+      float_type = true;
+      signed_type = true;
+      break;
+   case GLSL_TYPE_INT:
+   case GLSL_TYPE_INT64:
+      float_type = false;
+      signed_type = true;
+      break;
+   case GLSL_TYPE_UINT:
+   case GLSL_TYPE_UINT64:
+      float_type = false;
+      signed_type = false;
+      break;
+   }
 
    if (ir->operation == ir_unop_saturate) {
       if (ir->get_num_operands() != 1)
@@ -923,7 +944,7 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
       f->functions.push(type_id);
       f->functions.push(value_id);
       f->functions.push(f->import_id);
-      f->functions.push(GLSLstd450FClamp);
+      f->functions.push(float_type ? GLSLstd450FClamp : signed_type ? GLSLstd450SClamp : GLSLstd450UClamp);
       f->functions.push(operands[0]);
       f->functions.push(zero_ir.ir_value);
       f->functions.push(one_ir.ir_value);
@@ -935,7 +956,7 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
       unsigned int value_id = f->id++;
       if (ir->operands[0]->type->is_scalar()) {
          if (ir->operands[1]->type->is_scalar()) {
-            f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));
+            f->functions.push((float_type ? SpvOpFMul : SpvOpIMul) | (5 << SpvWordCountShift));
          } else if (ir->operands[1]->type->is_vector()) {
             f->functions.push(SpvOpVectorTimesScalar | (5 << SpvWordCountShift));
             operands[0] = ir->operands[1]->ir_value;
@@ -951,7 +972,7 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
          if (ir->operands[1]->type->is_scalar()) {
             f->functions.push(SpvOpVectorTimesScalar | (5 << SpvWordCountShift));
          } else if (ir->operands[1]->type->is_vector()) {
-            f->functions.push(SpvOpFMul | (5 << SpvWordCountShift));
+            f->functions.push((float_type ? SpvOpFMul : SpvOpIMul) | (5 << SpvWordCountShift));
          } else if (ir->operands[1]->type->is_matrix()) {
             f->functions.push(SpvOpVectorTimesMatrix | (5 << SpvWordCountShift));
          } else {
@@ -984,7 +1005,7 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
       default:
          unreachable("unknown operation");
       case ir_unop_neg:
-         f->functions.push(SpvOpFNegate | (4 << SpvWordCountShift));
+         f->functions.push((float_type ? SpvOpFNegate : SpvOpSNegate) | (4 << SpvWordCountShift));
          f->functions.push(type_id);
          f->functions.push(value_id);
          break;
@@ -993,7 +1014,7 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
          ir.ir_value = 0;
          visit(&ir);
 
-         f->functions.push(SpvOpFDiv | (5 << SpvWordCountShift));
+         f->functions.push((float_type ? SpvOpFDiv : signed_type ? SpvOpSDiv : SpvOpUDiv) | (5 << SpvWordCountShift));
          f->functions.push(type_id);
          f->functions.push(value_id);
          f->functions.push(ir.ir_value);
@@ -1021,22 +1042,22 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
          f->functions.push(f->import_id);
          switch (ir->operation) {
          default:
-         case ir_unop_abs:       f->functions.push(GLSLstd450FAbs);        break;
-         case ir_unop_sign:      f->functions.push(GLSLstd450FSign);       break;
-         case ir_unop_rsq:       f->functions.push(GLSLstd450InverseSqrt); break;
-         case ir_unop_sqrt:      f->functions.push(GLSLstd450Sqrt);        break;
-         case ir_unop_normalize: f->functions.push(GLSLstd450Normalize);   break;
-         case ir_unop_exp:       f->functions.push(GLSLstd450Exp);         break;
-         case ir_unop_log:       f->functions.push(GLSLstd450Log);         break;
-         case ir_unop_exp2:      f->functions.push(GLSLstd450Exp2);        break;
-         case ir_unop_log2:      f->functions.push(GLSLstd450Log2);        break;
-         case ir_unop_trunc:     f->functions.push(GLSLstd450Trunc);       break;
-         case ir_unop_ceil:      f->functions.push(GLSLstd450Ceil);        break;
-         case ir_unop_floor:     f->functions.push(GLSLstd450Floor);       break;
-         case ir_unop_fract:     f->functions.push(GLSLstd450Fract);       break;
-         case ir_unop_round_even:f->functions.push(GLSLstd450RoundEven);   break;
-         case ir_unop_sin:       f->functions.push(GLSLstd450Sin);         break;
-         case ir_unop_cos:       f->functions.push(GLSLstd450Cos);         break;
+         case ir_unop_abs:       f->functions.push(float_type ? GLSLstd450FAbs  : GLSLstd450SAbs);   break;
+         case ir_unop_sign:      f->functions.push(float_type ? GLSLstd450FSign : GLSLstd450SSign);  break;
+         case ir_unop_rsq:       f->functions.push(GLSLstd450InverseSqrt);                           break;
+         case ir_unop_sqrt:      f->functions.push(GLSLstd450Sqrt);                                  break;
+         case ir_unop_normalize: f->functions.push(GLSLstd450Normalize);                             break;
+         case ir_unop_exp:       f->functions.push(GLSLstd450Exp);                                   break;
+         case ir_unop_log:       f->functions.push(GLSLstd450Log);                                   break;
+         case ir_unop_exp2:      f->functions.push(GLSLstd450Exp2);                                  break;
+         case ir_unop_log2:      f->functions.push(GLSLstd450Log2);                                  break;
+         case ir_unop_trunc:     f->functions.push(GLSLstd450Trunc);                                 break;
+         case ir_unop_ceil:      f->functions.push(GLSLstd450Ceil);                                  break;
+         case ir_unop_floor:     f->functions.push(GLSLstd450Floor);                                 break;
+         case ir_unop_fract:     f->functions.push(GLSLstd450Fract);                                 break;
+         case ir_unop_round_even:f->functions.push(GLSLstd450RoundEven);                             break;
+         case ir_unop_sin:       f->functions.push(GLSLstd450Sin);                                   break;
+         case ir_unop_cos:       f->functions.push(GLSLstd450Cos);                                   break;
          }
          break;
       case ir_unop_f2i:
@@ -1047,12 +1068,12 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
       case ir_unop_u2i:
          switch (ir->operation) {
          default:
-         case ir_unop_f2i:   f->functions.push(SpvOpConvertFToS | (4 << SpvWordCountShift)); break;
-         case ir_unop_f2u:   f->functions.push(SpvOpConvertFToU | (4 << SpvWordCountShift)); break;
-         case ir_unop_i2f:   f->functions.push(SpvOpConvertSToF | (4 << SpvWordCountShift)); break;
-         case ir_unop_u2f:   f->functions.push(SpvOpConvertUToF | (4 << SpvWordCountShift)); break;
-         case ir_unop_i2u:   f->functions.push(SpvOpUConvert | (4 << SpvWordCountShift));    break;
-         case ir_unop_u2i:   f->functions.push(SpvOpSConvert | (4 << SpvWordCountShift));    break;
+         case ir_unop_f2i:   f->functions.push(SpvOpConvertFToS | (4 << SpvWordCountShift));   break;
+         case ir_unop_f2u:   f->functions.push(SpvOpConvertFToU | (4 << SpvWordCountShift));   break;
+         case ir_unop_i2f:   f->functions.push(SpvOpConvertSToF | (4 << SpvWordCountShift));   break;
+         case ir_unop_u2f:   f->functions.push(SpvOpConvertUToF | (4 << SpvWordCountShift));   break;
+         case ir_unop_i2u:   f->functions.push(SpvOpUConvert | (4 << SpvWordCountShift));      break;
+         case ir_unop_u2i:   f->functions.push(SpvOpSConvert | (4 << SpvWordCountShift));      break;
          }
          f->functions.push(type_id);
          f->functions.push(value_id);
@@ -1081,17 +1102,17 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
       case ir_binop_dot:
          switch (ir->operation) {
          default:
-         case ir_binop_add:         f->functions.push(SpvOpFAdd | (5 << SpvWordCountShift));                    break;
-         case ir_binop_sub:         f->functions.push(SpvOpFSub | (5 << SpvWordCountShift));                    break;
-         case ir_binop_div:         f->functions.push(SpvOpFDiv | (5 << SpvWordCountShift));                    break;
-         case ir_binop_mod:         f->functions.push(SpvOpFMod | (5 << SpvWordCountShift));                    break;
-         case ir_binop_less:        f->functions.push(SpvOpFOrdLessThan | (5 << SpvWordCountShift));            break;
-         case ir_binop_greater:     f->functions.push(SpvOpFOrdGreaterThan | (5 << SpvWordCountShift));         break;
-         case ir_binop_lequal:      f->functions.push(SpvOpFOrdLessThanEqual | (5 << SpvWordCountShift));       break;
-         case ir_binop_gequal:      f->functions.push(SpvOpFOrdGreaterThanEqual | (5 << SpvWordCountShift));    break;
-         case ir_binop_equal:       f->functions.push(SpvOpFOrdEqual | (5 << SpvWordCountShift));               break;
-         case ir_binop_nequal:      f->functions.push(SpvOpFOrdNotEqual | (5 << SpvWordCountShift));            break;
-         case ir_binop_dot:         f->functions.push(SpvOpDot | (5 << SpvWordCountShift));                     break;
+         case ir_binop_add:     f->functions.push((float_type ? SpvOpFAdd                 : SpvOpIAdd) | (5 << SpvWordCountShift));                                                      break;
+         case ir_binop_sub:     f->functions.push((float_type ? SpvOpFSub                 : SpvOpISub) | (5 << SpvWordCountShift));                                                      break;
+         case ir_binop_div:     f->functions.push((float_type ? SpvOpFDiv                 : signed_type ? SpvOpSDiv              : SpvOpUDiv) | (5 << SpvWordCountShift));               break;
+         case ir_binop_mod:     f->functions.push((float_type ? SpvOpFMod                 : signed_type ? SpvOpSMod              : SpvOpUMod) | (5 << SpvWordCountShift));               break;
+         case ir_binop_less:    f->functions.push((float_type ? SpvOpFOrdLessThan         : signed_type ? SpvOpSLessThan         : SpvOpULessThan) | (5 << SpvWordCountShift));          break;
+         case ir_binop_greater: f->functions.push((float_type ? SpvOpFOrdGreaterThan      : signed_type ? SpvOpSGreaterThan      : SpvOpUGreaterThan) | (5 << SpvWordCountShift));       break;
+         case ir_binop_lequal:  f->functions.push((float_type ? SpvOpFOrdLessThanEqual    : signed_type ? SpvOpSLessThanEqual    : SpvOpULessThanEqual) | (5 << SpvWordCountShift));     break;
+         case ir_binop_gequal:  f->functions.push((float_type ? SpvOpFOrdGreaterThanEqual : signed_type ? SpvOpSGreaterThanEqual : SpvOpUGreaterThanEqual) | (5 << SpvWordCountShift));  break;
+         case ir_binop_equal:   f->functions.push((float_type ? SpvOpFOrdEqual            : SpvOpIEqual) | (5 << SpvWordCountShift));                                                    break;
+         case ir_binop_nequal:  f->functions.push((float_type ? SpvOpFOrdNotEqual         : SpvOpINotEqual) | (5 << SpvWordCountShift));                                                 break;
+         case ir_binop_dot:     f->functions.push(SpvOpDot | (5 << SpvWordCountShift));                                                                                                  break;
          }
          f->functions.push(type_id);
          f->functions.push(value_id);
@@ -1106,10 +1127,10 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
          f->functions.push(f->import_id);
          switch (ir->operation) {
          default:
-         case ir_binop_min:      f->functions.push(GLSLstd450FMin);  break;
-         case ir_binop_max:      f->functions.push(GLSLstd450FMax);  break;
-         case ir_binop_pow:      f->functions.push(GLSLstd450Pow);   break;
-         case ir_binop_ldexp:    f->functions.push(GLSLstd450Ldexp); break;
+         case ir_binop_min:      f->functions.push(float_type ? GLSLstd450FMin : signed_type ? GLSLstd450SMin : GLSLstd450UMin);   break;
+         case ir_binop_max:      f->functions.push(float_type ? GLSLstd450FMax : signed_type ? GLSLstd450SMax : GLSLstd450UMax);   break;
+         case ir_binop_pow:      f->functions.push(GLSLstd450Pow);     break;
+         case ir_binop_ldexp:    f->functions.push(GLSLstd450Ldexp);   break;
          }
          break;
       }
@@ -1148,8 +1169,8 @@ void ir_print_spirv_visitor::visit(ir_expression *ir)
          f->functions.push(f->import_id);
          switch (ir->operation) {
          default:
-         case ir_triop_fma:   f->functions.push(GLSLstd450Fma);   break;
-         case ir_triop_lrp:   f->functions.push(GLSLstd450FMix);  break;
+         case ir_triop_fma:   f->functions.push(GLSLstd450Fma);                                break;
+         case ir_triop_lrp:   f->functions.push(float_type ? GLSLstd450FMix : GLSLstd450IMix); break;
          }
          break;
       }
