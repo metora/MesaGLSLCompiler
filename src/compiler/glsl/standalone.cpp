@@ -214,6 +214,10 @@ initialize_context(struct gl_context *ctx, gl_api api)
       ctx->Const.MaxUniformBufferBindings = 8;
       ctx->Const.MaxUniformBlockSize = 4096;
       ctx->Const.UniformBufferOffsetAlignment = 64;
+      ctx->Const.MaxCombinedShaderStorageBlocks = 16;
+      ctx->Const.MaxShaderStorageBufferBindings = 96;
+      ctx->Const.MaxShaderStorageBlockSize = 2147483647;
+      ctx->Const.ShaderStorageBufferOffsetAlignment = 16;
 
       ctx->Const.Program[MESA_SHADER_VERTEX].MaxAttribs = 16;
       ctx->Const.Program[MESA_SHADER_VERTEX].MaxTextureImageUnits = 16;

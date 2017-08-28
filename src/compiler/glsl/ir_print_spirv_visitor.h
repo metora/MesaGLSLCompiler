@@ -87,11 +87,13 @@ public:
    unsigned int const_float_id[16];
    unsigned int const_int_id[16];
    unsigned int sampler_id[16];
+   unsigned int struct_id[16][1+16];
 
    unsigned int pointer_bool_id[12];
    unsigned int pointer_float_id[12*4*4];
    unsigned int pointer_int_id[12*4*4];
    unsigned int pointer_sampler_id[16];
+   unsigned int pointer_struct_id[16];
 
    unsigned int input_loc;
    unsigned int output_loc;

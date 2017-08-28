@@ -453,7 +453,7 @@ ir_builder_print_visitor::print_without_declaration(const ir_swizzle *ir)
       static const char swiz[4] = { 'X', 'Y', 'Z', 'W' };
 
       print_without_indent("swizzle(r%04X, MAKE_SWIZZLE4(SWIZZLE_%c, SWIZZLE_%c, SWIZZLE_%c, SWIZZLE_%c), %u)",
-                           (unsigned)(uintptr_t) he->data,
+                           (unsigned)(uintptr_t) he ? he->data : 0,
                            swiz[ir->mask.x],
                            swiz[ir->mask.y],
                            swiz[ir->mask.z],
@@ -509,7 +509,7 @@ ir_builder_print_visitor::visit_enter(ir_assignment *ir)
       _mesa_hash_table_search(index_map, ir->lhs);
 
    print_with_indent("body.emit(assign(r%04X, ",
-                     (unsigned)(uintptr_t) he_lhs->data);
+                     (unsigned)(uintptr_t) he_lhs ? he_lhs->data : 0);
    print_without_declaration(ir->rhs);
    print_without_indent(", 0x%02x));\n\n", ir->write_mask);
 
@@ -528,8 +528,8 @@ ir_builder_print_visitor::visit_leave(ir_assignment *ir)
    assert(ir->condition == NULL);
 
    print_with_indent("body.emit(assign(r%04X, r%04X, 0x%02x));\n\n",
-                     (unsigned)(uintptr_t) he_lhs->data,
-                     (unsigned)(uintptr_t) he_rhs->data,
+                     (unsigned)(uintptr_t) he_lhs ? he_lhs->data : 0,
+                     (unsigned)(uintptr_t) he_rhs ? he_rhs->data : 0,
                      ir->write_mask);
 
    return visit_continue;
@@ -582,7 +582,7 @@ ir_builder_print_visitor::print_without_declaration(const ir_expression *ir)
          const struct hash_entry *const he =
             _mesa_hash_table_search(index_map, ir->operands[i]);
 
-         print_without_indent("r%04X", (unsigned)(uintptr_t) he->data);
+         print_without_indent("r%04X", (unsigned)(uintptr_t) he ? he->data : 0);
       }
 
       if (i < num_op - 1)
